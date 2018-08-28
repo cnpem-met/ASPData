@@ -1,13 +1,6 @@
-"""ERRROS
-- 'Preferences': Botao de load e save parameters ta zoado
-- 'Offline':
-- 'Online':
-    - o plot, depois de um longo periodo de aquisicao, fica comprometido
-      no sentido de que ele nao plota mais automaticamente
-    - depois de um longo tempo, vetor var.....Data[0].x e y começam a pegar muito
-      mais valores em cada leitura em vez de 1 só
-- ***PROGRAMA SENDO INTERROMPIDO POR ERRO DE EXECUÇÃO
-    - colocar 'try' e 'except' para achar o erro
+"""
+*** Teste commit ***
+
 """
 
 
@@ -71,8 +64,8 @@ class RIA(QtGui.QMainWindow):
 ##        var.rack2 = var.ria.ui.check2.isChecked()
 ##        var.rack3 = var.ria.ui.check3.isChecked()
 ##        var.rack4 = var.ria.ui.check4.isChecked()
-      
-        
+
+
         """reduz comprimento das celulas das tabelas"""
         var.ria.ui.tableWidget.resizeColumnsToContents()
         var.ria.ui.tableWidget_2.resizeColumnsToContents()
@@ -105,7 +98,7 @@ class RIA(QtGui.QMainWindow):
             self.set_plot7()
         if var.ria.ui.checkPlot8.isChecked():
             self.set_plot8()
-        
+
 
         """conecta sinais às respectivas funções"""
         QtCore.QObject.connect(var.ria.ui.ResButton, QtCore.SIGNAL("clicked()"),
@@ -175,7 +168,7 @@ class RIA(QtGui.QMainWindow):
             val = var.disp_sensores[k]
             self.list_val = np.append(self.list_val, val)
         var.ria.ui.plotBoxSens_off.addItems(self.list_val)
-        
+
         """adiciona lista de sensores que podem ser usados como referencia"""
         with open('parameters.dat', 'r') as f:
             lines = f.readlines()
@@ -206,7 +199,7 @@ class RIA(QtGui.QMainWindow):
         plot.set_plot15_on()
         plot.set_plot16_on()
 
-        
+
         """conecta sinais às respectivas funções"""
         var.ria.ui.cal.clicked[QtCore.QDate].connect(plot.showDate)
         var.ria.ui.btn1.clicked[bool].connect(plot.getDate_ini)
@@ -287,7 +280,7 @@ class RIA(QtGui.QMainWindow):
     #lista portas disponíveis
     def list_ports(self):
         self.ports_list = []
-        
+
         for i in list_ports.comports():
             self.ports_list.append(i[0])
 
@@ -322,7 +315,7 @@ class RIA(QtGui.QMainWindow):
         self.enable.start()
 
     #Muda flag e led de status do rack
-    def enable_racks(self):        
+    def enable_racks(self):
         if var.ria.ui.check1.isChecked() and var.rack1 == False:
             var.ria.ui.led1_g.show()
             var.rack1 = True
@@ -748,7 +741,7 @@ class RIA(QtGui.QMainWindow):
                         var.ria.ui.widget.Data[15].x = np.append(var.ria.ui.widget.Data[15].x, i[0])
                         var.ria.ui.widget.Data[15].y = np.append(var.ria.ui.widget.Data[15].y, i[self.index[1]+1])
 
-    
+
     #atualiza tabela com os valores recebidos
     def refresh_table(self, i):
         if i == 1:
@@ -760,7 +753,7 @@ class RIA(QtGui.QMainWindow):
                     self.item = QtGui.QTableWidgetItem(str('%.3f' %var.D1[-1][(j+1)]))
                     var.ria.ui.tableWidget.setItem(0,j, self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D1[-1][(j+1)] - var.Do[0][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D1[-1][(j+1)] - var.Do[0][j])))
                     var.ria.ui.tableWidget.setItem(1,j, self.item)
                     """atualiza valores em Davg"""
                     var.Davg[0][j] = var.wlast*var.Davg[0][j] + var.wcurr*var.D1[-1][(j+1)]
@@ -772,7 +765,7 @@ class RIA(QtGui.QMainWindow):
                     self.item = QtGui.QTableWidgetItem(str('%.3f' %var.T1[-1][(j+1)]))
                     var.ria.ui.tableWidget.setItem(3,j, self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T1[-1][(j+1)] - var.To[0][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T1[-1][(j+1)] - var.To[0][j])))
                     var.ria.ui.tableWidget.setItem(4,j, self.item)
                     """atualiza valores em Tavg"""
                     var.Tavg[0][j] = var.wlast*var.Tavg[0][j] + var.wcurr*var.T1[-1][(j+1)]
@@ -788,7 +781,7 @@ class RIA(QtGui.QMainWindow):
                 "não atualiza caso haja apenas um conjunto de dados em D1"""
                 print("erro ao atualizar rack 1")
                 pass
-                
+
         elif i == 2:
             try:
                 len(var.D2[0])
@@ -798,7 +791,7 @@ class RIA(QtGui.QMainWindow):
                     self.item = QtGui.QTableWidgetItem(str('%.3f' %var.D2[-1][(j+1)]))
                     var.ria.ui.tableWidget.setItem(0,(j+8), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D2[-1][(j+1)] - var.Do[1][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D2[-1][(j+1)] - var.Do[1][j])))
                     var.ria.ui.tableWidget.setItem(1,(j+8), self.item)
                     """atualiza valores em Davg"""
                     var.Davg[1][j] = var.wlast*var.Davg[1][j] + var.wcurr*var.D2[-1][(j+1)]
@@ -813,7 +806,7 @@ class RIA(QtGui.QMainWindow):
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3,(j+8), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T2[-1][(j+1)] - var.To[1][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T2[-1][(j+1)] - var.To[1][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4,(j+8), self.item)
                     """atualiza valores em Tavg"""
@@ -842,7 +835,7 @@ class RIA(QtGui.QMainWindow):
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0,(j+16), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D3[-1][(j+1)] - var.Do[2][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D3[-1][(j+1)] - var.Do[2][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(1,(j+16), self.item)
                     """atualiza valores em Davg"""
@@ -858,7 +851,7 @@ class RIA(QtGui.QMainWindow):
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3,(j+16), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T3[-1][(j+1)] - var.To[1][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T3[-1][(j+1)] - var.To[1][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4,(j+16), self.item)
                     """atualiza valores em Tavg"""
@@ -887,7 +880,7 @@ class RIA(QtGui.QMainWindow):
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0,(j+24), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D4[-1][(j+1)] - var.Do[3][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.D4[-1][(j+1)] - var.Do[3][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(1,(j+24), self.item)
                     """atualiza valores em Davg"""
@@ -903,7 +896,7 @@ class RIA(QtGui.QMainWindow):
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3,(j+24), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T4[-1][(j+1)] - var.To[3][j])))        
+                    self.item = QtGui.QTableWidgetItem(str('%.3f' %(var.T4[-1][(j+1)] - var.To[3][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4,(j+24), self.item)
                     """atualiza valores em Tavg"""
@@ -923,11 +916,11 @@ class RIA(QtGui.QMainWindow):
                 print("erro ao atualizar rack 4")
                 pass
 
-            
+
 
     ###Fim das funções diretamente relacionadas à interface
 
-        
+
     #gera checksum dos dados enviados
     def checksum(self, data):
         self.sum = 0
@@ -962,7 +955,7 @@ class RIA(QtGui.QMainWindow):
         self.data_str = self.data_str + chr(0x03)
 
         return self.data_str
-    
+
     #checa se checksum de resposta do rack está correto
     def check_response(self, response):
         self.sum = 0
@@ -973,12 +966,12 @@ class RIA(QtGui.QMainWindow):
                 pass
             else:
                 self.sum += int(('0x'+response[i:(i+2)]), 16)
-                
+
         #se self.sum não for múltiplo de 256, erro no checksum
         if divmod(self.sum, 256)[1] != 0:
             print(hex(self.sum)[-2:-1] + " erro no checksum")
-        
-            
+
+
     #converte valores de tensão recebidos dos racks para nível e temperatura
     def v_converter(self, resp, i):
         self.vtmp = np.array([])
@@ -991,7 +984,7 @@ class RIA(QtGui.QMainWindow):
         self.timesec = time.time()
         self.D = np.array([self.timesec])
         self.T = np.array([self.timesec])
-        
+
         if resp[4] != '0':
             """muda flag de status do rack"""
             var.rack_status[(i-1)] = False
@@ -1006,7 +999,7 @@ class RIA(QtGui.QMainWindow):
                 var.ria.ui.led3_y.show()
             if i == 4:
                 var.ria.ui.led4_g.hide()
-                var.ria.ui.led4_y.show()            
+                var.ria.ui.led4_y.show()
             """checa status em caso de flag de erro no rack"""
             self.check_status([i])
             """caso rack não retorne erros, muda flag de status"""
@@ -1020,7 +1013,7 @@ class RIA(QtGui.QMainWindow):
                 var.ria.ui.led3_g.show()
             if i == 4:
                 var.ria.ui.led4_g.show()
-            
+
         for j in range(16):
             """converte os caracteres recebidos para bits, permitindo recuperar
             o valor de ponto flutuante da tensão"""
@@ -1041,14 +1034,14 @@ class RIA(QtGui.QMainWindow):
             self.exp = int(('0b' + self.vtmp[j][1:9]), 2) - 127
             self.mantissa = (int(('0b' + self.vtmp[j][9:]), 2)/2**23 + 1)
             self.output = float(self.sig+str(self.mantissa))*2**self.exp
-            
+
             """Mantissa de índices pares, relativos às medidas de nível"""
             if divmod(j, 2)[1] == 0:
 ##                self.mantissa = (int(('0b' + self.vtmp[j][9:]), 2)/2**23 + 1)*4
 ##                self.output = float(self.sig+str(self.mantissa)+'e'+str(self.exp))
                 self.output = var.D_Rack[i-1][int(j/2)](self.output)
-                self.D = np.append(self.D, self.output)            
-                
+                self.D = np.append(self.D, self.output)
+
                 """Mantissa de índices ímpares, relativos à medidas de temperatura"""
             else:
 ##                self.mantissa = (int(('0b' + self.vtmp[j][9:]), 2)/2**23 + 1)*4
@@ -1058,7 +1051,7 @@ class RIA(QtGui.QMainWindow):
                 self.output = var.pol_T(self.output)
                 self.T = np.append(self.T, self.output)
             self.vout = np.append(self.vout, self.output)
-                
+
         self.v = np.reshape(self.vout, (8,2))
 
         """correção de nível por dilatação térmica da água:"""
@@ -1069,9 +1062,9 @@ class RIA(QtGui.QMainWindow):
         """aplicação das correções:"""
         self.D[1:] = self.D[1:] + self.Cdag - self.Cm
         #self.D[10] = var.H7DC_041(self.D[10])
-            
-    
-            
+
+
+
 
     #envia dados para racks
     def send(self, data):
@@ -1092,17 +1085,17 @@ class RIA(QtGui.QMainWindow):
         self.response = self.ser.read(200).decode("utf-8")
         print('\n'+'Rx: ' + self.response)
         self.check_response(self.response)
-        
-       
+
+
     #inicializa racks
     def init_rack(self, address):
         for i in address:
-            if i > 0 and i < 5:    
+            if i > 0 and i < 5:
                 self.data = chr(i) + chr(0xf0)
                 self.send(self.data)
                 time.sleep(1.2)
 
-                self.data = chr(i) + chr(0xf1)                
+                self.data = chr(i) + chr(0xf1)
                 self.send(self.data)
                 time.sleep(0.1)
                 if self.response == "" and i == 1:
@@ -1120,7 +1113,7 @@ class RIA(QtGui.QMainWindow):
                 if self.response == "" and i == 4:
                     var.rack_status[3] = False
                     var.ria.ui.led4_g.hide()
-                    var.ria.ui.led4_y.show()               
+                    var.ria.ui.led4_y.show()
             else:
                 print("Rack address out of range")
 
@@ -1149,7 +1142,7 @@ class RIA(QtGui.QMainWindow):
                         var.rack_status[3] = False
                         var.ria.ui.led4_g.hide()
                         var.ria.ui.led4_y.show()
-                    print("Não foi possível estabelecer comunicação com o Rack %d"%i) 
+                    print("Não foi possível estabelecer comunicação com o Rack %d"%i)
                     print("\n")
                 elif self.response[4] == '1':
                     print('Falha no Rack %d  \n' %i)
@@ -1220,18 +1213,18 @@ class RIA(QtGui.QMainWindow):
         try:
             #aux.plotFlagRIAcom = True #NOVO - Flag para liberar o plot dos racks simultaneamente no 'Online'
             self.save_log(address)
-            #aux.plotFlagRIAcom = False #NOVO        
+            #aux.plotFlagRIAcom = False #NOVO
         except:
             print("Erro FlagRIAcom")
             raise
-        
+
     #checa status do(s) rack(s)
     def check_status(self, address):
         for i in address:
             if i < 5 and i > 0:
                 self.send(chr(i)+chr(0xF6))
                 if self.response == "":
-                    print("Não foi possível estabelecer comunicação com o Rack %d"%i) 
+                    print("Não foi possível estabelecer comunicação com o Rack %d"%i)
                     print("\n")
                 elif self.response[3:5] == '00':
                     print('Rack %d ok \n' %i)
@@ -1241,7 +1234,7 @@ class RIA(QtGui.QMainWindow):
                 print('Endereço %i não existe \n' %i)
 
 
-    #salva dados dos sensores    
+    #salva dados dos sensores
     def save_log(self, address):
         """adquire data e hora em que os dados foram salvos e tira a média"""
         self.date = time.strftime("%Y_%m_%d", time.localtime()) #adquire data
@@ -1250,13 +1243,13 @@ class RIA(QtGui.QMainWindow):
 
         self.dir = 'Data/'
         """salva dados em arquivos nomeados por data, na forma:
-        data, hora, D1, D2, D3, D4, D5, D6, D7, D8, T1, T2, T3, T4, T5, T6, T7, T8"""        
+        data, hora, D1, D2, D3, D4, D5, D6, D7, D8, T1, T2, T3, T4, T5, T6, T7, T8"""
         for i in address:
             if i < 5 and i > 0:
                 try:
                     """salva dados do rack 1"""
                     if i == 1:
-                        len(var.D1[0])  #teste para ver se há mais de um elemento em D                  
+                        len(var.D1[0])  #teste para ver se há mais de um elemento em D
                         try:
                             f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1288,7 +1281,7 @@ class RIA(QtGui.QMainWindow):
 
                     """salva dados do rack 2"""
                     if i == 2:
-                        len(var.D2[0])  #teste para ver se há mais de um elemento em D                
+                        len(var.D2[0])  #teste para ver se há mais de um elemento em D
                         try:
                             f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1318,7 +1311,7 @@ class RIA(QtGui.QMainWindow):
 
                     """salva dados do rack 3"""
                     if i == 3:
-                        len(var.D3[0])  #teste para ver se há mais de um elemento em D                   
+                        len(var.D3[0])  #teste para ver se há mais de um elemento em D
                         try:
                             f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1348,7 +1341,7 @@ class RIA(QtGui.QMainWindow):
 
                     """salva dados do rack 4"""
                     if i == 4:
-                        len(var.D4[0])  #teste para ver se há mais de um elemento em D                    
+                        len(var.D4[0])  #teste para ver se há mais de um elemento em D
                         try:
                             f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1377,16 +1370,16 @@ class RIA(QtGui.QMainWindow):
                                 f.write('\n')
                     #print('Dados do rack %d salvos.' %i)
                 except TypeError:
-                    """não salva nada caso haja apenas um elemento em D"""                
+                    """não salva nada caso haja apenas um elemento em D"""
                     pass
                 except IndexError:
-                    """não salva nada caso haja apenas um elemento em D"""                
-                    pass                        
+                    """não salva nada caso haja apenas um elemento em D"""
+                    pass
 
             else:
                 print('Endereço %i não existe \n' %i)
 
-    
+
 
     #salva parâmetros em disco
     def save_param(self):
@@ -1472,20 +1465,20 @@ class RIA(QtGui.QMainWindow):
 
             """Salva indice da porta de comunicação"""
             f.write(str(var.ria.ui.PortBox.currentIndex())+'\n')
-    
+
 
             print("Parâmetros salvos")
 
     #carrega parâmetros salvos em disco
     def load_param(self):
-        
+
         with open('parameters.dat', 'r') as f:
             lines = f.readlines()
-            
+
             var.t_aq = float(lines[0]) #ANTES ERA INT
             var.t_cmp = int(lines[2])
 #            plot.set_dataList()
-            
+
             """Carrega status do Rack 1"""
             if lines[3] == 'True\n':
                 var.rack1 = True
@@ -1535,7 +1528,7 @@ class RIA(QtGui.QMainWindow):
                 self.item = QtGui.QTableWidgetItem(str('%.3f' %var.Do[3][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0,(i+24), self.item)
-                
+
             """Carrega To"""
             a = lines[11].split('\t')[:-1]
             for i in range(8):
@@ -1561,7 +1554,7 @@ class RIA(QtGui.QMainWindow):
                 self.item = QtGui.QTableWidgetItem(str('%.3f' %var.To[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(1,(i+24), self.item)
-                
+
             """Carrega Davg"""
             a = lines[15].split('\t')[:-1]
             for i in range(8):
@@ -1662,7 +1655,7 @@ class RIA(QtGui.QMainWindow):
 
             """Carrega indice de porta de comunicação serial"""
             var.ria.ui.PortBox.setCurrentIndex(int(lines[25]))
-            
+
             #NOVO{
             """Carrega estado dos plots da aba 'Online'"""
             var.ria.ui.checkPlot1_on.setChecked(0)
@@ -1728,8 +1721,8 @@ class RIA(QtGui.QMainWindow):
                 pass
             except TypeError:
                 pass
-            
-            
+
+
             """referencia temperatura"""
             try:
                 var.To[0] = var.T1[-1][1:]
@@ -1770,7 +1763,7 @@ class RIA(QtGui.QMainWindow):
             except IndexError:
                 pass
             except TypeError:
-                pass            
+                pass
             print("Reference set")
         except IndexError:
             pass
@@ -1888,7 +1881,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 if len(var.ria.ui.widget.Data[4].x) > var.cmp:
                     var.ria.ui.widget.Data[4].x = var.ria.ui.widget.Data[4].x[1:]
-                    var.ria.ui.widget.Data[4].y = var.ria.ui.widget.Data[4].y[1:] 
+                    var.ria.ui.widget.Data[4].y = var.ria.ui.widget.Data[4].y[1:]
                     var.ria.ui.widget.Data[5].x = var.ria.ui.widget.Data[5].x[1:]
                     var.ria.ui.widget.Data[5].y = var.ria.ui.widget.Data[5].y[1:]
             except TypeError:
@@ -2048,8 +2041,8 @@ class RIA(QtGui.QMainWindow):
                     var.ria.ui.widget.Data[15].y = var.ria.ui.widget.Data[15].y[1:]
             except TypeError:
                 pass
-    
-            
+
+
 
 ##ria = RIA()
 
@@ -2097,9 +2090,9 @@ class Plot(threading.Thread):
         self._stop()
     def run(self):
         while var.graphFlag:
-            pass                    
-                
-               
+            pass
+
+
 if __name__ == "__main__":
     telas = Screen()
 
