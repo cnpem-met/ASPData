@@ -1,0 +1,1 @@
+c:\Python32\Lib\site-packages\PyQt4\pyuic4.bat -o Fogale_UI.py Fogale.ui
