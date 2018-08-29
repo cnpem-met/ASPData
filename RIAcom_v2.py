@@ -1255,9 +1255,12 @@ class RIA(QtGui.QMainWindow):
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D1[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    #dados serão arrendondados para apresentarem 4 casas decimais
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T1[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(str(round_val)+'\t')
                                 f.write('\n')
                         except:
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1274,9 +1277,11 @@ class RIA(QtGui.QMainWindow):
                                         var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D1[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T1[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(str(round_val)+'\t')
                                 f.write('\n')
 
                     """salva dados do rack 2"""
@@ -1287,9 +1292,11 @@ class RIA(QtGui.QMainWindow):
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D2[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T2[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
                         except:
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1304,9 +1311,11 @@ class RIA(QtGui.QMainWindow):
                                         var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D2[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T2[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
 
                     """salva dados do rack 3"""
@@ -1317,9 +1326,11 @@ class RIA(QtGui.QMainWindow):
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.dateacquire1) + '\t' + str(self.time) + '\t')
                                 for a in var.D3[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T3[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
                         except:
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1334,9 +1345,11 @@ class RIA(QtGui.QMainWindow):
                                         var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D3[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T3[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
 
                     """salva dados do rack 4"""
@@ -1347,9 +1360,11 @@ class RIA(QtGui.QMainWindow):
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D4[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T4[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
                         except:
                             with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
@@ -1364,9 +1379,11 @@ class RIA(QtGui.QMainWindow):
                                         var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D4[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 for a in var.T4[-1][1:]:
-                                    f.write(str(a)+'\t')
+                                    round_val = str("{:.4f}".format(abs(round(a,4))))
+                                    f.write(round_val+'\t')
                                 f.write('\n')
                     #print('Dados do rack %d salvos.' %i)
                 except TypeError:
