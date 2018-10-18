@@ -1,0 +1,59 @@
+HLS_sensor1 - X: 0 m
+HLS_sensor1 - Y: 0 m
+
+HLS_sensor2 - X: 0 m
+HLS_sensor2 - Y: 0 m
+
+HLS_sensor3 - X: 0 m
+HLS_sensor3 - Y: 0 m
+
+HLS_sensor4 - X: 0 m
+HLS_sensor4 - Y: 0 m
+
+HLS_sensor5 - X: 0 m
+HLS_sensor5 - Y: 0 m
+
+HLS_sensor6 - X: 0 m
+HLS_sensor6 - Y: 0 m
+
+HLS_sensor7 - X: 0 m
+HLS_sensor7 - Y: 0 m
+
+HLS_sensor8 - X: 0 m
+HLS_sensor8 - Y: 0 m
+
+HLS_sensor9 - X: 0 m
+HLS_sensor9 - Y: 0 m
+
+HLS_sensor10 - X: 0 m
+HLS_sensor10 - Y: 0 m
+
+HLS_sensor11 - X: 0 m
+HLS_sensor11 - Y: 0 m
+
+HLS_sensor12 - X: 0 m
+HLS_sensor12 - Y: 0 m
+
+HLS_sensor13 - X: 0 m
+HLS_sensor13 - Y: 0 m
+
+HLS_sensor14 - X: 0 m
+HLS_sensor14 - Y: 0 m
+
+HLS_sensor15 - X: 0 m
+HLS_sensor15 - Y: 0 m
+
+HLS_sensor16 - X: 0 m
+HLS_sensor16 - Y: 0 m
+
+HLS_sensor17 - X: 0 m
+HLS_sensor17 - Y: 0 m
+
+HLS_sensor18 - X: 0 m
+HLS_sensor18 - Y: 0 m
+
+HLS_sensor19 - X: 0 m
+HLS_sensor19 - Y: 0 m
+
+HLS_sensor20 - X: 0 m
+HLS_sensor20 - Y: 0 m

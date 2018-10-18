@@ -1,0 +1,15 @@
+HLS_sensor16 - Nivel: 8.7183 mm
+HLS_sensor16 - Temp: 23.6667 C
+
+HLS_sensor17 - Nivel: 7.8482 mm
+HLS_sensor17 - Temp: 26.4032 C
+
+HLS_sensor18 - Nivel: 8.1623 mm
+HLS_sensor18 - Temp: 26.4856 C
+
+HLS_sensor19 - Nivel: 8.2888 mm
+HLS_sensor19 - Temp: 26.7883 C
+
+HLS_sensor20 - Nivel: 8.0271 mm
+HLS_sensor20 - Temp: 26.9349 C
+

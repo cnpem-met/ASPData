@@ -1236,27 +1236,36 @@ class RIA(QtGui.QMainWindow):
     # gera arquivo .txt que será lido e gerará dados para EPICs
     def txtToEpics(self, dataToEpics, i):
         self.doc = 'EPICs/RACK'+str(i)+'_EPICS.txt'
+        #self.cont_sens
+        if(i==1):
+            self.cont_sens = 0
         try:
             with open(self.doc, 'r+') as arq:
                 string = arq.read()
-                for j in range(int(len(dataToEpics)/2)):
-                    pos1=string.index("HLS_sensor"+str(j+1)+" - Nivel",0)
-                    pos1=string.index(":",pos1)
-                    pos1=pos1+2+3*j
-                    arq.seek(pos1)
-                    arq.write(dataToEpics[j*2])
+                #for j in range(int(len(dataToEpics)/2)):
+                for j in range(8):
+                    if(var.sensor_EPICSlist[i-1][j]!= "N/C"):
+                        self.cont_sens += 1
+                        pos1=string.index("HLS_sensor"+str(self.cont_sens)+" - Nivel",0)
+                        pos1=string.index(":",pos1)
+                        pos1=pos1+2+3*j
+                        arq.seek(pos1)
+                        arq.write(str(dataToEpics[j]))
 
-                    pos1=string.index("\nHLS_sensor"+str(j+1)+" - Temp",0)
-                    pos1=string.index(":",pos1)
-                    pos1=pos1+3+3*j
-                    arq.seek(pos1)
-                    arq.write(dataToEpics[j*2+1])
+                        pos1=string.index("\nHLS_sensor"+str(self.cont_sens)+" - Temp",0)
+                        pos1=string.index(":",pos1)
+                        pos1=pos1+3+3*j
+                        arq.seek(pos1)
+                        arq.write(str(dataToEpics[j+8]))
 
         except:
             with open(self.doc, 'w') as arq:
-                for j in range(int(len(dataToEpics)/2)):
-                    arq.write('HLS_sensor' +str(j+1)+ ' - Nivel: '+ dataToEpics[j*2] + ' mm\n')
-                    arq.write('HLS_sensor' +str(j+1)+ ' - Temp: ' + dataToEpics[j*2+1] + ' C\n\n')
+                for j in range(8):
+                    if(var.sensor_EPICSlist[i-1][j]!= "N/C"):
+                        self.cont_sens +=1
+                        arq.write('HLS_sensor' +str(self.cont_sens)+ ' - Nivel: '+ str(dataToEpics[j]) + ' mm\n')
+                        arq.write('HLS_sensor' +str(self.cont_sens)+ ' - Temp: '+ str(dataToEpics[j+8]) + ' C\n\n') 
+
 
     #salva dados dos sensores
     def save_log(self, address):
@@ -1308,9 +1317,6 @@ class RIA(QtGui.QMainWindow):
                                     f.write(str(round_val)+'\t')
                                 f.write('\n')
 
-                        """ Teste de integração com EPICs """
-                        dataToEpics = []
-
                         # nessa implementação ele filtra os dados pelos valores
                         #k = 0
                         #j = 0
@@ -1321,16 +1327,17 @@ class RIA(QtGui.QMainWindow):
                         #        k+=2
                         #    j+=1
 
-                        # nessa implementação ele não filtra os valores, apenas pega os numSensores primeiros dados
-                        k = 0
-                        numSensors = 2 #numero de sensores neste Rack
+                        """# implementação funcional
+                        # Teste de integração com EPICs
+                        self.dataToEpics = np.array([])
+                        numSensors = 8 #numero de sensores neste Rack
                         for j in range(numSensors):
-                            dataToEpics[k] = str("{:.4f}".format(abs(round(var.D1[-1][j],4))))
-                            dataToEpics[k+1] = str("{:.4f}".format(abs(round(var.T1[-1][j],4))))
-                            k+=2
+                            self.dataToEpics = np.append(self.dataToEpics, str("{:.4f}".format(abs(round(var.D1[-1][j+1],4)))))
+                            self.dataToEpics = np.append(self.dataToEpics, str("{:.4f}".format(abs(round(var.T1[-1][j+1],4)))))
 
+                        self.numRack = i
                         #chama funcao para guardar valores atuais no txt que será enviado para o epics
-                        self.txtToEpics(dataToEpics, i)
+                        self.txtToEpics(self.dataToEpics, i)"""
 
 
                     """salva dados do rack 2"""
@@ -1434,6 +1441,34 @@ class RIA(QtGui.QMainWindow):
                                     round_val = str("{:.4f}".format(abs(round(a,4))))
                                     f.write(round_val+'\t')
                                 f.write('\n')
+                                
+                    """ trecho teste para EPICS """
+                    self.dataToEpics = np.array([])
+                    if(i==1):
+                        valD = var.D1[-1][1:]
+                        valT = var.T1[-1][1:]
+                    elif(i==2):
+                        valD = var.D2[-1][1:]
+                        valT = var.T2[-1][1:]
+                    elif(i==3):
+                        valD = var.D3[-1][1:]
+                        valT = var.T3[-1][1:]
+                    elif(i==4):
+                        valD = var.D4[-1][1:]
+                        valT = var.T4[-1][1:]
+                    txtD = np.array([])
+                    txtT = np.array([])
+                    for k in range(8):
+                        valD[k] = str("{:.4f}".format(abs(round(valD[k],4))))
+                        valT[k] = str("{:.4f}".format(abs(round(valT[k],4))))
+                    self.dataToEpics = np.append(self.dataToEpics, valD)
+                    self.dataToEpics = np.append(self.dataToEpics, valT)
+                    #print(self.dataToEpics)
+                    
+                    self.numRack = i
+                    #chama funcao para guardar valores atuais no txt que será enviado para o epics
+                    self.txtToEpics(self.dataToEpics, i)
+                        
                     #print('Dados do rack %d salvos.' %i)
                 except TypeError:
                     """não salva nada caso haja apenas um elemento em D"""
