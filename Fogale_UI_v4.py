@@ -20,6 +20,8 @@ except AttributeError:
     def _fromUtf8(s):
         return s
 
+
+
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
@@ -32,12 +34,12 @@ except AttributeError:
     def __init__(self, *args, **kwds):
         pg.ViewBox.__init__(self, *args, **kwds)
         self.setMouseMode(self.RectMode)
-        
+
     ## reimplement right-click to zoom out
     def mouseClickEvent(self, ev):
         if ev.button() == QtCore.Qt.RightButton:
             self.autoRange()
-            
+
     def mouseDragEvent(self, ev):
         if ev.button() == QtCore.Qt.RightButton:
             ev.ignore()
@@ -574,7 +576,7 @@ class Ui_MainWindow(object):
         self.groupBox_off2 = QtGui.QGroupBox(self.groupBox_off1)
         self.groupBox_off2.setGeometry(QtCore.QRect(15, 20, 117, 145)) #816, 326
         self.groupBox_off2.setObjectName(_fromUtf8("groupBox_off1"))
-        
+
         """Botao de plot 'valores absolutos' para aba Offline"""
         self.plotAbsBtn_off = QtGui.QPushButton(self.groupBox_off2)
         self.plotAbsBtn_off.setGeometry(QtCore.QRect(10, 20, 75, 23))
@@ -601,7 +603,7 @@ class Ui_MainWindow(object):
         self.groupBox_off3 = QtGui.QGroupBox(self.groupBox_off1)
         self.groupBox_off3.setGeometry(QtCore.QRect(150, 20, 140, 220)) #816, 326
         self.groupBox_off3.setObjectName(_fromUtf8("groupBox_off1"))
-    
+
 
         """PlotBox para selecao de plot 'nivel' ou 'temp'"""
         self.plotBox_off = QtGui.QComboBox(self.groupBox_off3)
@@ -632,7 +634,7 @@ class Ui_MainWindow(object):
 
         self.text3 = QtGui.QLabel("Hora/data da ref fixa:", self.groupBox_off3)
         self.text3.setGeometry(10, 120, 120, 15)
-        
+
         """log para estipular quantidade de segundos que se quer ter de shift entre um dado plotado e outro"""
         """self.logShift_off = QTextEdit(self.groupBox_off3)
         self.logShift_off.setReadOnly(False)
@@ -650,11 +652,11 @@ class Ui_MainWindow(object):
         self.plotBoxShift_off.setMaximum(10000)
         self.plotBoxShift_off.setProperty("value", 1)
         self.plotBoxShift_off.setObjectName(_fromUtf8("shiftSpin"))
-        
+
         self.text4 = QtGui.QLabel("Shift de amostragem [seg]:", self.groupBox_off3)
         self.text4.setGeometry(10, 170, 220, 15)
 
-        
+
         self.groupBox_off4 = QtGui.QGroupBox(self.groupBox_off1)
         self.groupBox_off4.setGeometry(QtCore.QRect(305, 20, 100,125)) #816, 326
         self.groupBox_off4.setObjectName(_fromUtf8("groupBox_off4"))
@@ -678,8 +680,8 @@ class Ui_MainWindow(object):
         #self.btn_play.setIcon(QtGui.QIcon('play.jpg'))
         self.setRefBtn_off.setIconSize(QtCore.QSize(45,45))
 
-        
-        
+
+
         """# Create stop button
         self.btn_stop = QtGui.QPushButton('',self.Offline)
         self.btn_stop.setGeometry(x-35,y,30,30)
@@ -696,7 +698,7 @@ class Ui_MainWindow(object):
         font = self.logOutput_off.font()
         font.setFamily("Courier")
         font.setPointSize(10)
-        
+
         self.logOutput_off.setCurrentFont(font)
         #logOutput.setTextColor(color)
         self.logOutput_off.insertPlainText("Analise de dados - HLS Fogale" + '\n')
@@ -761,7 +763,7 @@ class Ui_MainWindow(object):
         self.list = ["Nível", "Temperatura"]
         """adiciona lista de sensores ao menu dos Plots"""
         self.plotBox_on.addItems(self.list)
-        
+
 
         """Botao de plot do valor absoluto de todos os sensores"""
         self.plotRefFixBtn = QtGui.QPushButton(self.Online)
@@ -795,7 +797,7 @@ class Ui_MainWindow(object):
         self.btn_stop2.setGeometry(450, 490, 75, 23)
         self.btn_stop2.setText("Stop Plot")
         self.btn_stop2.setIconSize(QtCore.QSize(44,44))
-        
+
         self.TextRef = QtGui.QLabel("Opções de referência", self.Online)
         self.TextRef.setGeometry(30, 450, 120, 18)
 
@@ -808,7 +810,7 @@ class Ui_MainWindow(object):
         self.plotBoxSens_on = QtGui.QComboBox(self.Online)
         self.plotBoxSens_on.setGeometry(QtCore.QRect(115, 512, 75, 18))
         self.plotBoxSens_on.setObjectName(_fromUtf8("PlotBoxSensor"))
-        
+
         self.cmp_on = QtGui.QSpinBox(self.Online)
         self.cmp_on.setGeometry(QtCore.QRect(250, 500, 56, 22))
         self.cmp_on.setMinimum(2)
@@ -825,12 +827,12 @@ class Ui_MainWindow(object):
         self.cmpLabel.setGeometry(QtCore.QRect(250, 477, 126, 16))
         self.cmpLabel.setObjectName(_fromUtf8("label_6"))
         self.cmpLabel.setText(_translate("MainWindow", "Number of Graph Points:", None))
-        
+
         #self.groupBox_7 = QtGui.QGroupBox(self.Monitor)
         #self.groupBox_7.setGeometry(QtCore.QRect(10, 15, 806, 121))
         #self.groupBox_7.setObjectName(_fromUtf8("groupBox_7")
 
-        
+
         x=200
         y=570
         """checkPlots"""
@@ -915,7 +917,7 @@ class Ui_MainWindow(object):
         self.logMinY.setLineWrapMode(QTextEdit.NoWrap)
         self.logMinY.moveCursor(QTextCursor.End)
         self.logMinY.setGeometry(640,520,70,20)
-        
+
         # scaleMaxY textbox 600,440,75,23
         self.logMaxY = QTextEdit(self.Online)
         self.logMaxY.setReadOnly(False)
@@ -929,7 +931,7 @@ class Ui_MainWindow(object):
         self.logMinX.setLineWrapMode(QTextEdit.NoWrap)
         self.logMinX.moveCursor(QTextCursor.End)
         self.logMinX.setGeometry(720,520,100,20)
-        
+
         # scaleMaxX textbox 600,440,75,23
         self.logMaxX = QTextEdit(self.Online)
         self.logMaxX.setReadOnly(False)
@@ -961,7 +963,7 @@ class Ui_MainWindow(object):
         self.textData = QtGui.QLabel("Data:", self.Online)
         self.textData.setGeometry(830, 473, 30, 15)
 
-        
+
         font = self.logMaxY.font()
         font.setFamily("Courier")
         font.setPointSize(10)
@@ -985,11 +987,11 @@ class Ui_MainWindow(object):
         font = self.logOutput_on.font()
         font.setFamily("Courier")
         font.setPointSize(10)
-        
+
         self.logOutput_on.setCurrentFont(font)
         #logOutput.setTextColor(color)
         self.logOutput_on.insertPlainText("Analise de dados - HLS Fogale" + '\n')
-        
+
         """Textos para checkPlots"""
         x = 217
         y = 570
@@ -1007,7 +1009,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        
+
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.groupBox_3.setTitle(_translate("MainWindow", "Graphics", None))
@@ -1295,7 +1297,7 @@ class Ui_MainWindow(object):
         self.cmp.setToolTip(_translate("MainWindow", "Number of points in graph", None))
         self.cmp.setStatusTip(_translate("MainWindow", "Number of points in graph", None))
         self.label_6.setText(_translate("MainWindow", "Number of Graph Points:", None))
-        self.groupBox_7.setTitle(_translate("MainWindow", "Plot Preferences", None)) 
+        self.groupBox_7.setTitle(_translate("MainWindow", "Plot Preferences", None))
         self.PlotBox1.setToolTip(_translate("MainWindow", "Select Plot Curve", None))
         self.PlotBox1.setStatusTip(_translate("MainWindow", "Select Plot Curve", None))
         self.checkPlot1.setToolTip(_translate("MainWindow", "Enable/Disable Plot 1", None))
@@ -1366,6 +1368,6 @@ class Ui_MainWindow(object):
         self.logDateTime_off.setToolTip(_translate("MainWindow", "Set the date and time of the data that is wanted to be de referency values. Format: HH:MM:SS dd/mm/yyyy", None))
         self.text3.setToolTip(_translate("MainWindow", "Set the date and time of the data that is wanted to be de referency values. Format: HH:MM:SS dd/mm/yyyy", None))
 
-        
+
 from PlotGUI_Qwt_Multi_v3 import SimplePlot
 from PlotGUI_Qwt_Multi_v3 import SimplePlot_on

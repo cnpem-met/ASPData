@@ -19,13 +19,19 @@ class Var(object):
                        "H7DC_52", "H7DC_53", "H7DC_54", "H7DC_55", "H7DC_56",
                        "H7DC_57", "H7DC_58", "H7DC_59", "H7DC_60", "H7DC_61"]
 
+        """ lista de sensores p/ colocar no script do EPICS """
+        self.sensor_EPICSlist =  [["35", "48", "39", "32", "34", "50", "51", "52"],
+                                  ["45", "59", "56", "44", "33", "43", "36", "N/C"],
+                                  ["38", "57", "47", "55", "40", "N/C", "N/C", "N/C"],
+                                  ["N/C", "N/C", "N/C", "N/C","N/C", "N/C", "N/C", "N/C"]]
+
         """lista de referencia da disposicao dos sensores"""
-        self.disp_sensores =  [["H7DC_51", "H7DC_49", "H7DC_35", "H7DC_34",
-                               "H7DC_48", "H7DC_50", "H7DC_41", "H7DC_54"],
-                               ["N/C", "N/C", "N/C", "N/C",  
-                                "N/C", "N/C", "N/C", "N/C"], 
-                               ["N/C", "N/C", "N/C", "N/C",  
-                                "N/C", "N/C", "N/C", "N/C"], 
+        self.disp_sensores =  [["H7DC_35", "H7DC_48", "H7DC_39", "H7DC_32",
+                               "H7DC_34", "H7DC_50", "H7DC_51", "H7DC_52"],
+                               ["H7DC_45", "H7DC_59", "H7DC_56", "H7DC_44",  
+                                "H7DC_33", "H7DC_43", "H7DC_36", "N/C"], 
+                               ["H7DC_38", "H7DC_57", "H7DC_47", "H7DC_55",  
+                                "H7DC_40", "N/C", "N/C", "N/C"], 
                                ["N/C", "N/C", "N/C", "N/C",  
                                 "N/C", "N/C", "N/C", "N/C"]]
 
@@ -186,16 +192,15 @@ class Var(object):
         #=============================================================================#
 
                     ### Configuração da atual disposição dos sensores na bancada METRO (SÓ UM RACK) ###
-        self.D_Rack = [[self.H7DC_051, self.H7DC_049, self.H7DC_035, self.H7DC_034,  
-                        self.H7DC_048, self.H7DC_050, self.H7DC_041, self.H7DC_054], 
-                       [self.H7DC_036, self.H7DC_044, self.H7DC_042, self.H7DC_056,  
-                        self.H7DC_045, self.H7DC_038, self.H7DC_032, self.H7DC_055], 
+        self.D_Rack = [[self.H7DC_035, self.H7DC_048, self.H7DC_039, self.H7DC_032,  
+                        self.H7DC_034, self.H7DC_050, self.H7DC_051, self.H7DC_052], 
+                       [self.H7DC_045, self.H7DC_059, self.H7DC_056, self.H7DC_044,  
+                        self.H7DC_033, self.H7DC_043, self.H7DC_036, self.H7DC_062], 
+                       [self.H7DC_038, self.H7DC_057, self.H7DC_047, self.H7DC_055,  
+                        self.H7DC_040, self.H7DC_062, self.H7DC_062, self.H7DC_062], 
                        [self.H7DC_062, self.H7DC_062, self.H7DC_062, self.H7DC_062,  
-                        self.H7DC_062, self.H7DC_053, self.H7DC_062, self.H7DC_062], 
-                       [self.H7DC_037, self.H7DC_062, self.H7DC_058, self.H7DC_043,  
-                        self.H7DC_060, self.H7DC_061, self.H7DC_062, self.H7DC_063]]
+                        self.H7DC_062, self.H7DC_062, self.H7DC_062, self.H7DC_062]]
                     ### ideia: implementar isso automaticamente, junto a 'sensor_list' ###
-
 
         ###Correção térmica do nível###
         """correção de dilatação termica da água:"""
