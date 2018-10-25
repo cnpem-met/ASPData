@@ -7,14 +7,8 @@ from PyQt4.QtGui import *
 import matplotlib.pyplot as plt
 import PyQt4.Qwt5 as Qwt
 from os import listdir
-from functools import partial
-from Variaveis_v2 import var
-from Auxiliar import aux
-from PlotGUI_Qwt_Multi_v3 import dataclass
-
-
-sys.path.insert(0, "C:/users/rodrigo.neto/desktop/HLS-BancadaMETRO")
-
+from Variables import var
+from Plot_definitions import dataclass
 
 class PlotOnOff:
     def __init__(self):
@@ -22,22 +16,23 @@ class PlotOnOff:
         self.data_fim = ""
         self.data = ""
         self.flagPlot_off = False
+        self.plotBox_act()
 
     """ Define between level and temperature variable to be plotted """
     def plotBox_act(self):
         # plot level
         if var.ria.ui.plotBox_on.currentIndex() == 0:
-            aux.plotSet = "nivel"
+            self.plotSet = "nivel"
             var.ria.ui.widget_on.setAxisTitle(Qwt.QwtPlot.yLeft, 'Height [mm]')
         else:
             # plot temperature
-            aux.plotSet = "temp"
+            self.plotSet = "temp"
             var.ria.ui.widget_on.setAxisTitle(Qwt.QwtPlot.yLeft, 'Temperature [ºC]')
 
     def plotBox_dataAct(self):
         self.currentDate = var.ria.ui.plotBox_data.currentText()
 
-    """ generate a menu with the last 5 days past to choose plotting """
+    """ generate a menu with the last 5 past days to choose plotting """
     def set_dataList(self):
         self.listData = []
         for i in range (5):
@@ -49,38 +44,32 @@ class PlotOnOff:
     def set_cmp_on(self):
         var.cmp_on = var.ria.ui.cmp_on.value()
 
-    def set_checkCmp_on(self):
-        if var.ria.ui.checkCmp_on.isChecked():
-            aux.flagCmp = True
-        else:
-            aux.flagCmp = False
-
    # seta valores de referencia com botao 'Set Ref'
     def setRef_on(self):
         if(var.rack1 == 1):
-            aux.refD1 = var.D1[-1][1:]
+            var.refD1 = var.D1[-1][1:]
             # teste de nova referencia, em relação ao shift inicial no plot de refSensor ##
             try:
-                self.shiftSensD1 = aux.refD1 - self.val_ref_D
+                self.shiftSensD1 = var.refD1 - self.val_ref_D
             except:
                 pass
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(aux.refD1)+', time: ' +
+                                                    str(var.refD1)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack2 == 1):
-            aux.refD2 = var.D2[-1][1:]
+            var.refD2 = var.D2[-1][1:]
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(aux.refD2)+', time: ' +
+                                                    str(var.refD2)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack3 == 1):
-            aux.refD3 = var.D3[-1][1:]
+            var.refD3 = var.D3[-1][1:]
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(aux.refD3)+', time: ' +
+                                                    str(var.refD3)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack4 == 1):
-            aux.refD4 = var.D4[-1][1:]
+            var.refD4 = var.D4[-1][1:]
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(aux.refD4)+', time: ' +
+                                                    str(var.refD4)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
 
     def set_plot_on(self, j):
@@ -94,229 +83,53 @@ class PlotOnOff:
             var.ria.ui.widget_on.Data[j] = dataclass()
         else:
             """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[j].setTitle(var.disp_sensores[0][j])
+            var.ria.ui.widget_on.Plots[j].setTitle(var.disp_sensores[int(j/8)][j%8])
             var.ria.ui.widget_on.Data[j] = dataclass()
 
-    # inicializa Plot1
-    def set_plot1_on(self):
-        if not var.ria.ui.checkPlot1_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[0].setTitle("")
-            var.ria.ui.widget_on.Data[0] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[0].setTitle(var.disp_sensores[0][0])
-            var.ria.ui.widget_on.Data[0] = dataclass()
-
-    # inicializa Plot2
-    def set_plot2_on(self):
-        if not var.ria.ui.checkPlot2_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[1].setTitle("")
-            var.ria.ui.widget_on.Data[1] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[1].setTitle(var.disp_sensores[0][1])
-            var.ria.ui.widget_on.Data[1] = dataclass()
-
-    # inicializa Plot3
-    def set_plot3_on(self):
-        if not var.ria.ui.checkPlot3_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[2].setTitle("")
-            var.ria.ui.widget_on.Data[2] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[2].setTitle(var.disp_sensores[0][2])
-            var.ria.ui.widget_on.Data[2] = dataclass()
-
-    # inicializa Plot4
-    def set_plot4_on(self):
-        if not var.ria.ui.checkPlot4_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[3].setTitle("")
-            var.ria.ui.widget_on.Data[3] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[3].setTitle(var.disp_sensores[0][3])
-            var.ria.ui.widget_on.Data[3] = dataclass()
-
-    # inicializa Plot5
-    def set_plot5_on(self):
-        if not var.ria.ui.checkPlot5_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[4].setTitle("")
-            var.ria.ui.widget_on.Data[4] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[4].setTitle(var.disp_sensores[0][4])
-            var.ria.ui.widget_on.Data[4] = dataclass()
-
-    # inicializa Plot6
-    def set_plot6_on(self):
-        if not var.ria.ui.checkPlot6_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[5].setTitle("")
-            var.ria.ui.widget_on.Data[5] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[5].setTitle(var.disp_sensores[0][5])
-            var.ria.ui.widget_on.Data[5] = dataclass()
-
-    # inicializa Plot7
-    def set_plot7_on(self):
-        if not var.ria.ui.checkPlot7_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[6].setTitle("")
-            var.ria.ui.widget_on.Data[6] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[6].setTitle(var.disp_sensores[0][6])
-            var.ria.ui.widget_on.Data[6] = dataclass()
-
-    # inicializa Plot8
-    def set_plot8_on(self):
-        if not var.ria.ui.checkPlot8_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[7].setTitle("")
-            var.ria.ui.widget_on.Data[7] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget_on.Plots[7].setTitle(var.disp_sensores[0][7])
-            var.ria.ui.widget_on.Data[7] = dataclass()
-
-    # inicializa Plot9
-    def set_plot9_on(self):
-        if not var.ria.ui.checkPlot9_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[8].setTitle("")
-            var.ria.ui.widget_on.Data[8] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[8].setTitle(var.disp_sensores[1][0])
-            var.ria.ui.widget_on.Data[8] = dataclass()
-
-    #inicializa Plot10
-    def set_plot10_on(self):
-        if not var.ria.ui.checkPlot10_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[9].setTitle("")
-            var.ria.ui.widget_on.Data[9] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[9].setTitle(var.disp_sensores[1][1])
-            var.ria.ui.widget_on.Data[9] = dataclass()
-
-    #inicializa Plot11
-    def set_plot11_on(self):
-        if not var.ria.ui.checkPlot11_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[10].setTitle("")
-            var.ria.ui.widget_on.Data[10] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[10].setTitle(var.disp_sensores[1][2])
-            var.ria.ui.widget_on.Data[10] = dataclass()
-
-    #inicializa Plot12
-    def set_plot12_on(self):
-        if not var.ria.ui.checkPlot12_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[11].setTitle("")
-            var.ria.ui.widget_on.Data[11] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[11].setTitle(var.disp_sensores[1][3])
-            var.ria.ui.widget_on.Data[11] = dataclass()
-
-    #inicializa Plot13
-    def set_plot13_on(self):
-        if not var.ria.ui.checkPlot13_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[12].setTitle("")
-            var.ria.ui.widget_on.Data[12] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[12].setTitle(var.disp_sensores[1][4])
-            var.ria.ui.widget_on.Data[12] = dataclass()
-
-    #inicializa Plot14
-    def set_plot14_on(self):
-        if not var.ria.ui.checkPlot14_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[13].setTitle("")
-            var.ria.ui.widget_on.Data[13] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[13].setTitle(var.disp_sensores[1][5])
-            var.ria.ui.widget_on.Data[13] = dataclass()
-
-    #inicializa Plot15
-    def set_plot15_on(self):
-        if not var.ria.ui.checkPlot15_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[14].setTitle("")
-            var.ria.ui.widget_on.Data[14] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[14].setTitle(var.disp_sensores[1][6])
-            var.ria.ui.widget_on.Data[14] = dataclass()
-
-    #inicializa Plot16
-    def set_plot16_on(self):
-        if not var.ria.ui.checkPlot16_on.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[15].setTitle("")
-            var.ria.ui.widget_on.Data[15] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[15].setTitle(var.disp_sensores[1][7])
-            var.ria.ui.widget_on.Data[15] = dataclass()
-
     def startPlot_absBoxes(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "absBoxes"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: ABSOLUTA\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def startPlot_abs(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "abs"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: ABSOLUTA\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def startPlot_refSensor(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "refSensor"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: SENSOR\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def startPlot_refMediaG(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "refMediaG"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: MÉDIA GERAL\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def startPlot_refMediaI(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "refMediaI"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: MÉDIA LOCAL\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def startPlot_refFixa(self):
-        aux.plotFlag = True
+        var.plotFlag = True
         self.plotType_on = "refFixa"
         var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: VALOR FIXO\n")
         var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
         Plot_thread = Plot()
 
     def stopPlot(self):
-        aux.plotFlag = False
+        var.plotFlag = False
 
     def plot_call(self):
         # checking for updated data by inspecting the size of the tupple
@@ -326,127 +139,128 @@ class PlotOnOff:
         global tam_D4
         if(len(var.D1) != 0):
             if(len(var.D1) != tam_D1):
-                aux.rack1 = 1
+                var.rack1 = 1
                 tam_D1 = len(var.D1)
             else:
-                aux.rack1 = 0
+                var.rack1 = 0
         if(len(var.D2) != 0):
             if((len(var.D2) != tam_D2)):
-                aux.rack2 = 1
+                var.rack2 = 1
                 tam_D2 = len(var.D2)
             else:
-                aux.rack2 = 0
+                var.rack2 = 0
         if(len(var.D3) != 0):
             if((len(var.D3) != tam_D3)):
-                aux.rack3 = 1
+                var.rack3 = 1
                 tam_D3 = len(var.D3)
             else:
-                aux.rack3 = 0
+                var.rack3 = 0
         if(len(var.D4) != 0):
             if((len(var.D4) != tam_D4)):
-                aux.rack4 = 1
+                var.rack4 = 1
                 tam_D4 = len(var.D4)
             else:
-                aux.rack4 = 0
+                var.rack4 = 0
 
         # call a function to plot data not referenced (absolut values)
         if(self.plotType_on == "abs"):
-            if(aux.rack1 == 1):
+            if(var.rack1 == 1):
                 self.plot_abs(1)
-            if(aux.rack2 == 1):
+            if(var.rack2 == 1):
                 self.plot_abs(2)
-            if(aux.rack3 == 1):
+            if(var.rack3 == 1):
                 self.plot_abs(3)
-            if(aux.rack4 == 1):
+            if(var.rack4 == 1):
                 self.plot_abs(4)
         # call a function to plot data referenced by a specific sensor
         if(self.plotType_on == "refSensor"):
-            if(aux.rack1 == 1):
+            if(var.rack1 == 1):
                 self.plot_refSensor(1)
-            if(aux.rack2 == 1):
+            if(var.rack2 == 1):
                 self.plot_refSensor(2)
-            if(aux.rack3 == 1):
+            if(var.rack3 == 1):
                 self.plot_refSensor(3)
-            if(aux.rack4 == 1):
+            if(var.rack4 == 1):
                 self.plot_refSensor(4)
         # call a function to plot data referenced by the average of all sensors data
         if(self.plotType_on == "refMediaG"):
-            if(aux.rack1 == 1):
+            if(var.rack1 == 1):
                 self.plot_refMediaG(1)
-            if(aux.rack2 == 1):
+            if(var.rack2 == 1):
                 self.plot_refMediaG(2)
-            if(aux.rack3 == 1):
+            if(var.rack3 == 1):
                 self.plot_refMediaG(3)
-            if(aux.rack4 == 1):
+            if(var.rack4 == 1):
                 self.plot_refMediaG(4)
         # call a function to plot data referenced by sensor's own data average
         if(self.plotType_on == "refMediaI"):
-            if(aux.rack1 == 1):
+            if(var.rack1 == 1):
                 self.plot_refMediaI(1)
-            if(aux.rack2 == 1):
+            if(var.rack2 == 1):
                 self.plot_refMediaI(2)
-            if(aux.rack3 == 1):
+            if(var.rack3 == 1):
                 self.plot_refMediaI(3)
-            if(aux.rack4 == 1):
+            if(var.rack4 == 1):
                 self.plot_refMediaI(4)
         # call a function to plot data referenced by a specific value
         if(self.plotType_on == "refFixa"):
-            if(aux.rack1 == 1):
+            if(var.rack1 == 1):
                 self.plot_refFixa(1)
-            if(aux.rack2 == 1):
+            if(var.rack2 == 1):
                 self.plot_refFixa(2)
-            if(aux.rack3 == 1):
+            if(var.rack3 == 1):
                 self.plot_refFixa(3)
-            if(aux.rack4 == 1):
+            if(var.rack4 == 1):
                 self.plot_refFixa(4)
 
     def plotData(self, i, D, T):
         """lista criada para checar os checkPlots"""
-        self.list_check = [var.ria.ui.checkPlot1_on, var.ria.ui.checkPlot2_on,var.ria.ui.checkPlot3_on,var.ria.ui.checkPlot4_on,
-                           var.ria.ui.checkPlot5_on,var.ria.ui.checkPlot6_on,var.ria.ui.checkPlot7_on,var.ria.ui.checkPlot8_on,
-                           var.ria.ui.checkPlot9_on, var.ria.ui.checkPlot10_on,var.ria.ui.checkPlot11_on,var.ria.ui.checkPlot12_on,
-                           var.ria.ui.checkPlot13_on,var.ria.ui.checkPlot14_on,var.ria.ui.checkPlot15_on,var.ria.ui.checkPlot16_on]
+        self.list_check = [var.ria.ui.checkPlot1_on, var.ria.ui.checkPlot2_on, var.ria.ui.checkPlot3_on, var.ria.ui.checkPlot4_on,
+                           var.ria.ui.checkPlot5_on, var.ria.ui.checkPlot6_on, var.ria.ui.checkPlot7_on, var.ria.ui.checkPlot8_on,
+                           var.ria.ui.checkPlot9_on, var.ria.ui.checkPlot10_on, var.ria.ui.checkPlot11_on, var.ria.ui.checkPlot12_on,
+                           var.ria.ui.checkPlot13_on, var.ria.ui.checkPlot14_on, var.ria.ui.checkPlot15_on, var.ria.ui.checkPlot16_on]
         # correcting rack number to be used properly as index above
         i = i - 1
-        for j in range(8):
-            if(self.list_check[(i*8)+j].isChecked()):
-                # Level plot - y axis
-                if(aux.plotSet == "nivel"):
-                    var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
-                                var.ria.ui.widget_on.Data[(i*8)+j].y,
-                                self.D[j+1])
-                else:
-                    # Temperature plot - y axis
-                    var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
-                                var.ria.ui.widget_on.Data[(i*8)+j].y,
-                                self.T[j+1])
-                # Time scale - x axis
-                var.ria.ui.widget_on.Data[(i*8)+j].x = np.append(
-                                var.ria.ui.widget_on.Data[(i*8)+j].x,
-                                self.D[0]) # self.str_hora () ; self.str_hora = time.mktime(time.localtime())
-                # correcting x range
-                self.menor = var.ria.ui.widget_on.Data[(i*8)+j].x[0]
-                for k in range(var.ria.ui.widget_on.nplots): #nplots = 16
+        if(i <= 1):  # TEMPORARIO (checkPLots ainda vão só até 16)
+            for j in range(8):
+                if(self.list_check[(i*8)+j].isChecked()):
+                    # Level plot - y axis
+                    if(self.plotSet == "nivel"):
+                        var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
+                                    var.ria.ui.widget_on.Data[(i*8)+j].y,
+                                    self.D[j+1])
+                    else:
+                        # Temperature plot - y axis
+                        var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
+                                    var.ria.ui.widget_on.Data[(i*8)+j].y,
+                                    self.T[j+1])
+                    # Time scale - x axis
+                    var.ria.ui.widget_on.Data[(i*8)+j].x = np.append(
+                                    var.ria.ui.widget_on.Data[(i*8)+j].x,
+                                    self.D[0]) # self.str_hora () ; self.str_hora = time.mktime(time.localtime())
+                    # correcting x range
+                    self.menor = var.ria.ui.widget_on.Data[(i*8)+j].x[0]
+                    for k in range(var.ria.ui.widget_on.nplots): #nplots = 16
+                        try:
+                            if(var.ria.ui.widget_on.Data[k].x[0] < self.menor):
+                                self.menor = var.ria.ui.widget_on.Data[k].x[0]
+                        except:
+                            pass
                     try:
-                        if(var.ria.ui.widget_on.Data[k].x[0] < self.menor):
-                            self.menor = var.ria.ui.widget_on.Data[k].x[0]
-                    except:
-                        pass
-                try:
-                    var.ria.ui.widget_on.setAxisScale(var.ria.ui.widget_on.xBottom,
-                                                      self.menor, var.ria.ui.widget_on.Data[(i*8)+j].x[-1])
-                except TypeError:
-                        print('erro3\n')
-
-                """se o comprimento do vetor de dados for maior que limite, retira o valor mais antigo"""
-                if(aux.flagCmp):
-                    try:
-                        if len(var.ria.ui.widget_on.Data[(i*8)+j].x) > var.cmp_on:
-                            self.dif = len(var.ria.ui.widget_on.Data[(i*8)+j].x) - var.cmp_on
-                            var.ria.ui.widget_on.Data[(i*8)+j].x = var.ria.ui.widget_on.Data[(i*8)+j].x[self.dif:]
-                            var.ria.ui.widget_on.Data[(i*8)+j].y = var.ria.ui.widget_on.Data[(i*8)+j].y[self.dif:]
+                        var.ria.ui.widget_on.setAxisScale(var.ria.ui.widget_on.xBottom,
+                                                          self.menor, var.ria.ui.widget_on.Data[(i*8)+j].x[-1])
                     except TypeError:
-                        print('erro4\n')
+                            print('erro3\n')
+
+                    """se o comprimento do vetor de dados for maior que limite, retira o valor mais antigo"""
+                    if(var.ria.ui.checkCmp_on.isChecked()):
+                        try:
+                            if len(var.ria.ui.widget_on.Data[(i*8)+j].x) > var.cmp_on:
+                                self.dif = len(var.ria.ui.widget_on.Data[(i*8)+j].x) - var.cmp_on
+                                var.ria.ui.widget_on.Data[(i*8)+j].x = var.ria.ui.widget_on.Data[(i*8)+j].x[self.dif:]
+                                var.ria.ui.widget_on.Data[(i*8)+j].y = var.ria.ui.widget_on.Data[(i*8)+j].y[self.dif:]
+                        except TypeError:
+                            print('erro4\n')
 
     def plot_abs(self, i):
         if(i == 1):
@@ -572,22 +386,22 @@ class PlotOnOff:
     def plot_refDeltaCG(self, i):
         if(i == 1):
             self.D = var.D1[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD1)
+            self.D[1:] = np.subtract(self.D[1:], var.refD1)
             self.T = var.T1[-1][1:]
         elif(i == 2):
             self.D = var.D2[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD2)
+            self.D[1:] = np.subtract(self.D[1:], var.refD2)
             self.T = var.T2[-1][1:]
         elif(i == 3):
             self.D = var.D3[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD3)
+            self.D[1:] = np.subtract(self.D[1:], var.refD3)
             self.T = var.T3[-1][1:]
         elif(i == 4):
             self.D = var.D4[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD4)
+            self.D[1:] = np.subtract(self.D[1:], var.refD4)
             self.T = var.T4[-1][1:]
-        self.tanAng = (self.D[8]-self.D[1])/(aux.posSens[7]-aux.posSens[0])
-        self.posCG = (aux.posSens[0]+aux.posSens[1]+aux.posSens[2]+aux.posSens[3]+aux.posSens[4]+aux.posSens[5]+aux.posSens[6]+aux.posSens[7])/8
+        self.tanAng = (self.D[8]-self.D[1])/(var.posSens[7]-var.posSens[0])
+        self.posCG = (var.posSens[0]+var.posSens[1]+var.posSens[2]+var.posSens[3]+var.posSens[4]+var.posSens[5]+var.posSens[6]+var.posSens[7])/8
         self.deltaCG = self.posCG*self.tanAng
         self.D[1:] = np.add(self.D[1:], self.deltaCG)
 
@@ -601,53 +415,53 @@ class PlotOnOff:
             self.values = self.lines[-1].split()
             p.close()
             for j in range(8):
-                aux.sumD1[j] = aux.sumD1[j] + float(self.values[2+j])
-                aux.sumT1[j] = aux.sumT1[j] + float(self.values[10+j])
-            aux.sumD1[8] += 1  # total number of items to get the average
-            aux.sumT1[8] += 1
+                var.sumD1[j] = var.sumD1[j] + float(self.values[2+j])
+                var.sumT1[j] = var.sumT1[j] + float(self.values[10+j])
+            var.sumD1[8] += 1  # total number of items to get the average
+            var.sumT1[8] += 1
         if(var.rack2 == 1):
             p = open('Data/rack2_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
             for j in range(8):
-                aux.sumD2[j] = aux.sumD2[j] + float(self.values[2+j])
-                aux.sumT2[j] = aux.sumT2[j] + float(self.values[10+j])
-            aux.sumD2[8] += 1
-            aux.sumT2[8] += 1
+                var.sumD2[j] = var.sumD2[j] + float(self.values[2+j])
+                var.sumT2[j] = var.sumT2[j] + float(self.values[10+j])
+            var.sumD2[8] += 1
+            var.sumT2[8] += 1
         if(var.rack3 == 1):
             p = open('Data/rack3_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
             for j in range(8):
-                aux.sumD3[j] = aux.sumD3[j] + float(self.values[2+j])
-                aux.sumT3[j] = aux.sumT3[j] + float(self.values[10+j])
-            aux.sumD3[8] += 1
-            aux.sumT3[8] += 1
+                var.sumD3[j] = var.sumD3[j] + float(self.values[2+j])
+                var.sumT3[j] = var.sumT3[j] + float(self.values[10+j])
+            var.sumD3[8] += 1
+            var.sumT3[8] += 1
         if(var.rack4 == 1):
             p = open('Data/rack4_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
             for j in range(8):
-                aux.sumD4[j] = aux.sumD4[j] + float(self.values[2+j])
-                aux.sumT4[j] = aux.sumT4[j] + float(self.values[10+j])
-            aux.sumD4[8] += 1
-            aux.sumT4[8] += 1
+                var.sumD4[j] = var.sumD4[j] + float(self.values[2+j])
+                var.sumT4[j] = var.sumT4[j] + float(self.values[10+j])
+            var.sumD4[8] += 1
+            var.sumT4[8] += 1
 
         if(var.rack1):
-            self.meanD1 = np.divide(aux.sumD1, aux.sumD1[8])
-            self.meanT1 = np.divide(aux.sumT1, aux.sumT1[8])
+            self.meanD1 = np.divide(var.sumD1, var.sumD1[8])
+            self.meanT1 = np.divide(var.sumT1, var.sumT1[8])
         if(var.rack2):
-            self.meanD2 = np.divide(aux.sumD2, aux.sumD2[8])
-            self.meanT2 = np.divide(aux.sumT2, aux.sumT2[8])
+            self.meanD2 = np.divide(var.sumD2, var.sumD2[8])
+            self.meanT2 = np.divide(var.sumT2, var.sumT2[8])
         if(var.rack3):
-            self.meanD3 = np.divide(aux.sumD3, aux.sumD3[8])
-            self.meanT3 = np.divide(aux.sumT3, aux.sumT3[8])
+            self.meanD3 = np.divide(var.sumD3, var.sumD3[8])
+            self.meanT3 = np.divide(var.sumT3, var.sumT3[8])
         if(var.rack4):
-            self.meanD4 = np.divide(aux.sumD4, aux.sumD4[8])
-            self.meanT4 = np.divide(aux.sumT4, aux.sumT4[8])
+            self.meanD4 = np.divide(var.sumD4, var.sumD4[8])
+            self.meanT4 = np.divide(var.sumT4, var.sumT4[8])
 
         self.D = np.array([])
         self.T = np.array([])
@@ -716,47 +530,47 @@ class PlotOnOff:
     def plot_refFixa(self, i):
         if(i == 1):
             self.D = var.D1[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD1)
+            self.D[1:] = np.subtract(self.D[1:], var.refD1)
             self.T = var.T1[-1]
-            self.T[1:] = np.subtract(self.T[1:], aux.refT1)
+            self.T[1:] = np.subtract(self.T[1:], var.refT1)
         elif(i == 2):
             self.D = var.D2[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD2)
+            self.D[1:] = np.subtract(self.D[1:], var.refD2)
             self.T = var.T2[-1]
-            self.T[1:] = np.subtract(self.T[1:], aux.refT2)
+            self.T[1:] = np.subtract(self.T[1:], var.refT2)
         elif(i == 3):
             self.D = var.D3[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD3)
+            self.D[1:] = np.subtract(self.D[1:], var.refD3)
             self.T = var.T3[-1]
-            self.T[1:] = np.subtract(self.T[1:], aux.refT3)
+            self.T[1:] = np.subtract(self.T[1:], var.refT3)
         elif(i == 4):
             self.D = var.D4[-1]
-            self.D[1:] = np.subtract(self.D[1:], aux.refD4)
+            self.D[1:] = np.subtract(self.D[1:], var.refD4)
             self.T = var.T4[-1]
-            self.T[1:] = np.subtract(self.T[1:], aux.refT4)
+            self.T[1:] = np.subtract(self.T[1:], var.refT4)
 
         self.plotData(i, self.D, self.T)
 
     def setScalePlot(self):
 
-        aux.scaleMinY = var.ria.ui.logMinY.textCursor()
-        aux.scaleMinY = var.ria.ui.logMinY.toPlainText()
-        aux.scaleMaxY = var.ria.ui.logMaxY.textCursor()
-        aux.scaleMaxY = var.ria.ui.logMaxY.toPlainText()
-        aux.scaleMinX = var.ria.ui.logMinX.textCursor()
-        aux.scaleMinX = var.ria.ui.logMinX.toPlainText()
-        aux.scaleMaxX = var.ria.ui.logMaxX.textCursor()
-        aux.scaleMaxX = var.ria.ui.logMaxX.toPlainText()
+        var.scaleMinY = var.ria.ui.logMinY.textCursor()
+        var.scaleMinY = var.ria.ui.logMinY.toPlainText()
+        var.scaleMaxY = var.ria.ui.logMaxY.textCursor()
+        var.scaleMaxY = var.ria.ui.logMaxY.toPlainText()
+        var.scaleMinX = var.ria.ui.logMinX.textCursor()
+        var.scaleMinX = var.ria.ui.logMinX.toPlainText()
+        var.scaleMaxX = var.ria.ui.logMaxX.textCursor()
+        var.scaleMaxX = var.ria.ui.logMaxX.toPlainText()
 
-        self.str_horaMin = var.ria.ui.plotBox_data.currentText()+' '+aux.scaleMinX
+        self.str_horaMin = var.ria.ui.plotBox_data.currentText()+' '+var.scaleMinX
 
         a = time.strptime(self.str_horaMin, "%d/%m/%Y %H:%M:%S")
         self.flt_horaMin = time.mktime(a)
-        self.str_horaMax = var.ria.ui.plotBox_data.currentText()+' '+aux.scaleMaxX
+        self.str_horaMax = var.ria.ui.plotBox_data.currentText()+' '+var.scaleMaxX
         a = time.strptime(self.str_horaMax, "%d/%m/%Y %H:%M:%S")
         self.flt_horaMax = time.mktime(a)
 
-        var.ria.ui.widget_on.setAxisScale(0, float(aux.scaleMinY), float(aux.scaleMaxY))
+        var.ria.ui.widget_on.setAxisScale(0, float(var.scaleMinY), float(var.scaleMaxY))
         var.ria.ui.widget_on.setAxisScale(2, self.flt_horaMin, self.flt_horaMax)
         var.ria.ui.widget_on.zoomer.setZoomBase()
 
@@ -765,7 +579,7 @@ class PlotOnOff:
         var.ria.ui.widget_on.setAxisAutoScale(2)
         var.ria.ui.widget_on.zoomer.setZoomBase()
 
-    #converte mes no formato de 3 caracteres para numero
+    # converte mes no formato de 3 caracteres para numero
     def ReturnMonth(self, string):
         if string == 'jan':
             return '01'
@@ -840,7 +654,7 @@ class PlotOnOff:
                 #cont = 0
                 for j in onlyfiles:
                     if(j >= self.arq_ini and j <= self.arq_fim):
-                        aux.flag_freeToPlot_off = True #habilita plot
+                        var.flag_freeToPlot_off = True #habilita plot
                         self.flag_control_racks = i
                         f = open("Data/"+j, "r")
                         self.lines = f.readlines()
@@ -909,12 +723,37 @@ class PlotOnOff:
                     self.T = np.append(self.T, self.rack2_val_T[i][2:])
                 self.D = np.reshape(self.D, (int(len(self.D)/18), 18))
                 self.T = np.reshape(self.T, (int(len(self.T)/18), 18))
-            # elif(self.flag_control_racks == 3): ...
+            elif(self.flag_control_racks == 3):
+                self.D = []
+                self.T = []
+                for i in range(len(self.rack1_val_D)):
+                    self.D = np.append(self.D, self.rack1_val_D[i])
+                    self.D = np.append(self.D, self.rack2_val_D[i][2:])
+                    self.D = np.append(self.D, self.rack3_val_D[i][2:])
+                    self.T = np.append(self.T, self.rack1_val_T[i])
+                    self.T = np.append(self.T, self.rack2_val_T[i][2:])
+                    self.T = np.append(self.T, self.rack3_val_T[i][2:])
+                self.D = np.reshape(self.D, (int(len(self.D)/26), 26))
+                self.T = np.reshape(self.T, (int(len(self.T)/26), 26))
+            elif(self.flag_control_racks == 3):
+                self.D = []
+                self.T = []
+                for i in range(len(self.rack1_val_D)):
+                    self.D = np.append(self.D, self.rack1_val_D[i])
+                    self.D = np.append(self.D, self.rack2_val_D[i][2:])
+                    self.D = np.append(self.D, self.rack3_val_D[i][2:])
+                    self.D = np.append(self.D, self.rack4_val_D[i][2:])
+                    self.T = np.append(self.T, self.rack1_val_T[i])
+                    self.T = np.append(self.T, self.rack2_val_T[i][2:])
+                    self.T = np.append(self.T, self.rack3_val_T[i][2:])
+                    self.T = np.append(self.T, self.rack4_val_T[i][2:])
+                self.D = np.reshape(self.D, (int(len(self.D)/34), 34))
+                self.T = np.reshape(self.T, (int(len(self.T)/34), 34))
 
             self.D = np.transpose(self.D)
             self.T = np.transpose(self.T)
 
-            if(aux.flag_freeToPlot_off):
+            if(var.flag_freeToPlot_off):
                 if(self.plotType_off == "abs"):
                     self.plot_abs_off()
                 elif(self.plotType_off == "refSensor"):
@@ -944,6 +783,9 @@ class PlotOnOff:
         self.fig.canvas.draw()
 
     def plot_off(self, x, y):
+        self.fig = plt.figure(num=None, figsize=(14, 7.5), dpi=80, facecolor='w', edgecolor='k')
+        ax = self.fig.add_subplot(111)
+
         self.n = []
         # legendas #
         for k in range(2,len(self.D)):
@@ -980,8 +822,6 @@ class PlotOnOff:
         show()
 
     def plot_abs_off(self):
-        self.fig = plt.figure(num=None, figsize=(14, 7.5), dpi=80, facecolor='w', edgecolor='k')
-        ax = self.fig.add_subplot(111)
 
         self.x = []
         self.y = []
@@ -1000,9 +840,6 @@ class PlotOnOff:
         self.plot_off(self.x, self.y)
 
     def plot_refSensor_off(self):
-        self.fig = plt.figure(num=None, figsize=(14, 7.5), dpi=80, facecolor='w', edgecolor='k')
-        ax = self.fig.add_subplot(111)
-
         # valores da abscissa x e ordenada y #
         self.x = []
         self.y = []
@@ -1037,9 +874,6 @@ class PlotOnOff:
         self.plot_off(self.x, self.y)
 
     def plot_refMediaG_off(self):
-        self.fig = plt.figure(num=None, figsize=(14, 7.5), dpi=80, facecolor='w', edgecolor='k')
-        ax = self.fig.add_subplot(111)
-
         # valores da abscissa x e ordenada y #
         self.x = []
         self.y = []
@@ -1065,9 +899,6 @@ class PlotOnOff:
         self.plot_off(self.x, self.y)
 
     def plot_refFixa_off(self):
-        self.fig = plt.figure(num=None, figsize=(14, 7.5), dpi=80, facecolor='w', edgecolor='k')
-        ax = self.fig.add_subplot(111)
-
         # valores da abscissa x e ordenada y #
         self.x = []
         self.y = []
@@ -1175,8 +1006,9 @@ class Plot(threading.Thread):
         self.lines = param.readlines()
         self.date = time.strftime("%Y_%m_%d", time.localtime())
         try:
-            while aux.plotFlag:
+            while var.plotFlag:
                 plot.plot_call()
+                time.sleep(var.t_aq)
         except:
             print("Erro 22")
             raise

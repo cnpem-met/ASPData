@@ -7,20 +7,15 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-#import pyqtgraph as pg
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-import PyQt4.Qwt5 as Qwt
-from Variaveis_v2 import var
-import numpy as np
+from Variables import var
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
     def _fromUtf8(s):
         return s
-
-
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
@@ -30,121 +25,40 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-"""class CustomViewBox(pg.ViewBox):
-    def __init__(self, *args, **kwds):
-        pg.ViewBox.__init__(self, *args, **kwds)
-        self.setMouseMode(self.RectMode)
-
-    ## reimplement right-click to zoom out
-    def mouseClickEvent(self, ev):
-        if ev.button() == QtCore.Qt.RightButton:
-            self.autoRange()
-
-    def mouseDragEvent(self, ev):
-        if ev.button() == QtCore.Qt.RightButton:
-            ev.ignore()
-        else:
-            pg.ViewBox.mouseDragEvent(self, ev)"""
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.setEnabled(True)
-        MainWindow.resize(1300, 682)#N:1300, 682, V:853, 682
+        MainWindow.resize(1300, 682)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.tabWidget = QtGui.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(5, 10, 1290, 677)) #831, 626
+        self.tabWidget.setGeometry(QtCore.QRect(5, 10, 1290, 677))
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.Monitor = QtGui.QWidget()
         self.Monitor.setObjectName(_fromUtf8("Monitor"))
         self.groupBox_3 = QtGui.QGroupBox(self.Monitor)
-        self.groupBox_3.setGeometry(QtCore.QRect(5, 10, 1240, 326)) #816, 326
+        self.groupBox_3.setGeometry(QtCore.QRect(5, 10, 1240, 326))
         self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
         self.widget = SimplePlot(self.groupBox_3)
-        self.widget.setGeometry(QtCore.QRect(10, 20, 1210, 286))#796
+        self.widget.setGeometry(QtCore.QRect(10, 20, 1210, 286))
         self.widget.setObjectName(_fromUtf8("widget"))
         self.groupBox_4 = QtGui.QGroupBox(self.Monitor)
-        self.groupBox_4.setGeometry(QtCore.QRect(5, 345, 1042, 251))#686
+        self.groupBox_4.setGeometry(QtCore.QRect(5, 345, 1042, 251))
         self.groupBox_4.setObjectName(_fromUtf8("groupBox_4"))
         self.tableWidget = QtGui.QTableWidget(self.groupBox_4)
         self.tableWidget.setEnabled(True)
-        self.tableWidget.setGeometry(QtCore.QRect(10, 21, 1012, 226))#666
+        self.tableWidget.setGeometry(QtCore.QRect(10, 21, 1012, 226))
         self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
         self.tableWidget.setColumnCount(30)
         self.tableWidget.setRowCount(6)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(0, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(3, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(4, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(5, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(4, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(5, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(6, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(7, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(8, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(9, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(10, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(11, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(12, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(13, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(14, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(15, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(16, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(17, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(18, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(19, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(20, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(21, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(22, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(23, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(24, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(25, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(26, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(27, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(28, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(29, item)
+        for i in range(5):
+            item = QtGui.QTableWidgetItem()
+            self.tableWidget.setVerticalHeaderItem(i, item)
+        for i in range(29):
+            item = QtGui.QTableWidgetItem()
+            self.tableWidget.setHorizontalHeaderItem(i, item)
         self.groupBox_5 = QtGui.QGroupBox(self.Monitor)
         self.groupBox_5.setGeometry(QtCore.QRect(1061, 345, 120, 251))
         self.groupBox_5.setObjectName(_fromUtf8("groupBox_5"))
@@ -268,16 +182,16 @@ class Ui_MainWindow(object):
         self.Preferences = QtGui.QWidget()
         self.Preferences.setObjectName(_fromUtf8("Preferences"))
         self.groupBox_2 = QtGui.QGroupBox(self.Preferences)
-        self.groupBox_2.setGeometry(QtCore.QRect(10, 145, 1225, 446)) #806
+        self.groupBox_2.setGeometry(QtCore.QRect(10, 145, 1225, 446))
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.SaveButton = QtGui.QPushButton(self.groupBox_2)
-        self.SaveButton.setGeometry(QtCore.QRect(614, 410, 75, 23)) #405
+        self.SaveButton.setGeometry(QtCore.QRect(614, 410, 75, 23))
         self.SaveButton.setObjectName(_fromUtf8("SaveButton"))
         self.LoadButton = QtGui.QPushButton(self.groupBox_2)
-        self.LoadButton.setGeometry(QtCore.QRect(519, 410, 75, 23)) #320
+        self.LoadButton.setGeometry(QtCore.QRect(519, 410, 75, 23))
         self.LoadButton.setObjectName(_fromUtf8("LoadButton"))
         self.groupBox_6 = QtGui.QGroupBox(self.groupBox_2)
-        self.groupBox_6.setGeometry(QtCore.QRect(310, 15, 86, 111)) #275
+        self.groupBox_6.setGeometry(QtCore.QRect(310, 15, 86, 111))
         self.groupBox_6.setObjectName(_fromUtf8("groupBox_6"))
         self.check3 = QtGui.QCheckBox(self.groupBox_6)
         self.check3.setGeometry(QtCore.QRect(20, 60, 70, 17))
@@ -303,7 +217,7 @@ class Ui_MainWindow(object):
         self.label_9.setGeometry(QtCore.QRect(10, 265, 91, 16))
         self.label_9.setObjectName(_fromUtf8("label_9"))
         self.tableWidget_2 = QtGui.QTableWidget(self.groupBox_2)
-        self.tableWidget_2.setGeometry(QtCore.QRect(10, 140, 1194, 106))#786
+        self.tableWidget_2.setGeometry(QtCore.QRect(10, 140, 1194, 106))
         self.tableWidget_2.setObjectName(_fromUtf8("tableWidget_2"))
         self.tableWidget_2.setColumnCount(30)
         self.tableWidget_2.setRowCount(2)
@@ -311,68 +225,11 @@ class Ui_MainWindow(object):
         self.tableWidget_2.setVerticalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.tableWidget_2.setVerticalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(0, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(3, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(4, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(5, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(6, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(7, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(8, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(9, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(10, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(11, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(12, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(13, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(14, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(15, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(16, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(17, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(18, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(19, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(20, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(21, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(22, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(23, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(24, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(25, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(26, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(27, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(28, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(29, item)
+        for i in range(29):
+            item = QtGui.QTableWidgetItem()
+            self.tableWidget_2.setHorizontalHeaderItem(i, item)
         self.tableWidget_3 = QtGui.QTableWidget(self.groupBox_2)
-        self.tableWidget_3.setGeometry(QtCore.QRect(10, 285, 1194, 106)) #786
+        self.tableWidget_3.setGeometry(QtCore.QRect(10, 285, 1194, 106))
         self.tableWidget_3.setObjectName(_fromUtf8("tableWidget_3"))
         self.tableWidget_3.setColumnCount(32)
         self.tableWidget_3.setRowCount(2)
@@ -380,87 +237,26 @@ class Ui_MainWindow(object):
         self.tableWidget_3.setVerticalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.tableWidget_3.setVerticalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(0, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(3, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(4, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(5, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(6, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(7, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(8, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(9, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(10, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(11, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(12, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(13, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(14, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(15, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(16, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(17, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(18, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(19, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(20, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(21, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(22, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(23, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(24, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(25, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(26, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(27, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(28, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(29, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(30, item)
-        item = QtGui.QTableWidgetItem()
-        self.tableWidget_3.setHorizontalHeaderItem(31, item)
+        for i in range(31):
+            item = QtGui.QTableWidgetItem()
+            self.tableWidget_3.setHorizontalHeaderItem(i, item)
         self.groupBox = QtGui.QGroupBox(self.groupBox_2)
-        self.groupBox.setGeometry(QtCore.QRect(410, 15, 211, 111)) #550
+        self.groupBox.setGeometry(QtCore.QRect(410, 15, 211, 111))
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.PortBox = QtGui.QComboBox(self.groupBox)
         self.PortBox.setGeometry(QtCore.QRect(20, 45, 69, 22))
         self.PortBox.setObjectName(_fromUtf8("PortBox"))
         self.OpenButton = QtGui.QPushButton(self.groupBox)
-        self.OpenButton.setGeometry(QtCore.QRect(120, 15, 75, 23)) #120
+        self.OpenButton.setGeometry(QtCore.QRect(120, 15, 75, 23))
         self.OpenButton.setObjectName(_fromUtf8("OpenButton"))
         self.CloseButton = QtGui.QPushButton(self.groupBox)
-        self.CloseButton.setGeometry(QtCore.QRect(120, 45, 75, 23)) #120
+        self.CloseButton.setGeometry(QtCore.QRect(120, 45, 75, 23))
         self.CloseButton.setObjectName(_fromUtf8("CloseButton"))
         self.label_7 = QtGui.QLabel(self.groupBox)
         self.label_7.setGeometry(QtCore.QRect(20, 25, 61, 16))
         self.label_7.setObjectName(_fromUtf8("label_7"))
         self.RefreshButton = QtGui.QPushButton(self.groupBox)
-        self.RefreshButton.setGeometry(QtCore.QRect(120, 75, 75, 23)) #120
+        self.RefreshButton.setGeometry(QtCore.QRect(120, 75, 75, 23))
         self.RefreshButton.setObjectName(_fromUtf8("RefreshButton"))
         self.groupBox_8 = QtGui.QGroupBox(self.groupBox_2)
         self.groupBox_8.setGeometry(QtCore.QRect(10, 25, 286, 86))
@@ -483,7 +279,7 @@ class Ui_MainWindow(object):
         self.label_6.setGeometry(QtCore.QRect(155, 25, 126, 16))
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.groupBox_7 = QtGui.QGroupBox(self.Preferences)
-        self.groupBox_7.setGeometry(QtCore.QRect(10, 15, 1225, 121)) #806
+        self.groupBox_7.setGeometry(QtCore.QRect(10, 15, 1225, 121))
         self.groupBox_7.setObjectName(_fromUtf8("groupBox_7"))
         self.PlotBox1 = QtGui.QComboBox(self.groupBox_7)
         self.PlotBox1.setGeometry(QtCore.QRect(46, 60, 69, 22))
@@ -544,80 +340,71 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
 
-        """INICIO DA IMPLEMENTACAO DA INTERFACE GRAFICA PARA PLOTS"""
+        """ Beginning of implementation of graphical interface for plot functionalities """
 
-        """Aba 'Offline'"""
+        ### 'Offline plot' Tab ###
         self.Offline = QtGui.QWidget()
         self.Offline.setObjectName(_fromUtf8("Offline"))
         self.tabWidget.addTab(self.Offline, _fromUtf8(""))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Offline), _translate("MainWindow", "Offline", None))
 
-        #calendario
+        # calendar
         self.cal = QtGui.QCalendarWidget(self.Offline)
         self.cal.setGridVisible(True)
         self.cal.setGeometry(20,75,600,400)
 
 
-        #calendar buttons
-        self.btn1 = QtGui.QPushButton('Data Inicial',self.Offline)
-        #btn1.setCheckable(True)
+        # calendar buttons
+        self.btn1 = QtGui.QPushButton('Data Inicial', self.Offline)
         self.btn1.setGeometry(245, 500, 75, 23)
-        self.btn1.setIconSize(QtCore.QSize(44,44))
+        self.btn1.setIconSize(QtCore.QSize(44, 44))
 
-        self.btn2 = QtGui.QPushButton('Data Final',self.Offline)
-        #btn2.setCheckable(True)
+        self.btn2 = QtGui.QPushButton('Data Final', self.Offline)
         self.btn2.setGeometry(330, 500, 75, 23)
-        self.btn1.setIconSize(QtCore.QSize(44,44))
+        self.btn1.setIconSize(QtCore.QSize(44, 44))
 
         self.groupBox_off1 = QtGui.QGroupBox(self.Offline)
-        self.groupBox_off1.setGeometry(QtCore.QRect(730, 85, 420, 250)) #816, 326
+        self.groupBox_off1.setGeometry(QtCore.QRect(730, 85, 420, 250))
         self.groupBox_off1.setObjectName(_fromUtf8("groupBox_off1"))
 
         self.groupBox_off2 = QtGui.QGroupBox(self.groupBox_off1)
-        self.groupBox_off2.setGeometry(QtCore.QRect(15, 20, 117, 145)) #816, 326
+        self.groupBox_off2.setGeometry(QtCore.QRect(15, 20, 117, 145))
         self.groupBox_off2.setObjectName(_fromUtf8("groupBox_off1"))
 
-        """Botao de plot 'valores absolutos' para aba Offline"""
         self.plotAbsBtn_off = QtGui.QPushButton(self.groupBox_off2)
         self.plotAbsBtn_off.setGeometry(QtCore.QRect(10, 20, 75, 23))
         self.plotAbsBtn_off.setObjectName(_fromUtf8("PlotButton6off"))
         self.plotAbsBtn_off.setText(_translate("MainWindow", "Absoluto", None))
-        """Botao de plot dos valores dos sensores em relação a um sensor"""
+
         self.plotRefSensorBtn_off = QtGui.QPushButton(self.groupBox_off2)
         self.plotRefSensorBtn_off.setGeometry(QtCore.QRect(10, 50, 75, 23))
         self.plotRefSensorBtn_off.setObjectName(_fromUtf8("PlotButton3off"))
         self.plotRefSensorBtn_off.setText(_translate("MainWindow", "Sensor", None))
 
-        """Botao de plot dos valores dos sensores em relação a uma média geral"""
         self.plotRefMedGBtn_off = QtGui.QPushButton(self.groupBox_off2)
         self.plotRefMedGBtn_off.setGeometry(QtCore.QRect(10, 110, 75, 23))
         self.plotRefMedGBtn_off.setObjectName(_fromUtf8("PlotButton4off"))
         self.plotRefMedGBtn_off.setText(_translate("MainWindow", "Média Geral", None))
 
-        """Botao de plot dos valores dos sensores em relação a um conjunto de valores setados"""
         self.plotRefFixaBtn_off = QtGui.QPushButton(self.groupBox_off2)
         self.plotRefFixaBtn_off.setGeometry(QtCore.QRect(10, 80, 75, 23))
         self.plotRefFixaBtn_off.setObjectName(_fromUtf8("PlotButton5off"))
         self.plotRefFixaBtn_off.setText(_translate("MainWindow", "Ref Fixa", None))
 
         self.groupBox_off3 = QtGui.QGroupBox(self.groupBox_off1)
-        self.groupBox_off3.setGeometry(QtCore.QRect(150, 20, 140, 220)) #816, 326
+        self.groupBox_off3.setGeometry(QtCore.QRect(150, 20, 140, 220))
         self.groupBox_off3.setObjectName(_fromUtf8("groupBox_off1"))
 
-
-        """PlotBox para selecao de plot 'nivel' ou 'temp'"""
         self.plotBox_off = QtGui.QComboBox(self.groupBox_off3)
         self.plotBox_off.setGeometry(QtCore.QRect(10, 40, 75, 23))
         self.plotBox_off.setObjectName(_fromUtf8("plotBox"))
-        #NOVO{
+
         self.list = ["Nível", "Temperatura"]
-        """adiciona lista de sensores ao menu dos Plots"""
         self.plotBox_off.addItems(self.list)
 
         self.text1 = QtGui.QLabel("Variável:", self.groupBox_off3)
         self.text1.setGeometry(10, 20, 50, 15)
 
-        """plotBlox para seleção do sensor de referencia na aba 'Offline'"""
         self.plotBoxSens_off = QtGui.QComboBox(self.groupBox_off3)
         self.plotBoxSens_off.setGeometry(QtCore.QRect(10, 90, 75, 23))
         self.plotBoxSens_off.setObjectName(_fromUtf8("PlotBoxSensor_off"))
@@ -625,26 +412,14 @@ class Ui_MainWindow(object):
         self.text2 = QtGui.QLabel("Sensor de referência:", self.groupBox_off3)
         self.text2.setGeometry(10, 70, 120, 15)
 
-        """Log para receber data que se quer ter a referencia setada"""
         self.logDateTime_off = QTextEdit(self.groupBox_off3)
         self.logDateTime_off.setReadOnly(False)
         self.logDateTime_off.setLineWrapMode(QTextEdit.NoWrap)
         self.logDateTime_off.moveCursor(QTextCursor.End)
-        self.logDateTime_off.setGeometry(10,140,120,23)
+        self.logDateTime_off.setGeometry(10, 140, 120, 23)
 
-        self.text3 = QtGui.QLabel("Hora/data da ref fixa:", self.groupBox_off3)
+        self.text3 = QtGui.QLabel("datetime of the fixed reference: ", self.groupBox_off3)
         self.text3.setGeometry(10, 120, 120, 15)
-
-        """log para estipular quantidade de segundos que se quer ter de shift entre um dado plotado e outro"""
-        """self.logShift_off = QTextEdit(self.groupBox_off3)
-        self.logShift_off.setReadOnly(False)
-        self.logShift_off.setLineWrapMode(QTextEdit.NoWrap)
-        self.logShift_off.moveCursor(QTextCursor.End)
-        self.logShift_off.setGeometry(10,190,120,23)"""
-
-        """self.plotBoxShift_off = QtGui.QComboBox(self.groupBox_off3)
-        self.plotBoxShift_off.setGeometry(QtCore.QRect(10, 190, 120, 23))
-        self.plotBoxShift_off.setObjectName(_fromUtf8("PlotBoxShift_off"))"""
 
         self.plotBoxShift_off = QtGui.QSpinBox(self.groupBox_off3)
         self.plotBoxShift_off.setGeometry(QtCore.QRect(10, 190, 56, 23))
@@ -656,143 +431,88 @@ class Ui_MainWindow(object):
         self.text4 = QtGui.QLabel("Shift de amostragem [seg]:", self.groupBox_off3)
         self.text4.setGeometry(10, 170, 220, 15)
 
-
         self.groupBox_off4 = QtGui.QGroupBox(self.groupBox_off1)
-        self.groupBox_off4.setGeometry(QtCore.QRect(305, 20, 100,125)) #816, 326
+        self.groupBox_off4.setGeometry(QtCore.QRect(305, 20, 100,125))
         self.groupBox_off4.setObjectName(_fromUtf8("groupBox_off4"))
 
-        "Check para setar shift de segundos para amostragem"
         self.checkShift_off = QtGui.QCheckBox(self.groupBox_off4)
         self.checkShift_off.setGeometry(QtCore.QRect(10, 100, 120, 17))
         self.checkShift_off.setChecked(False)
         self.checkShift_off.setObjectName(_fromUtf8("checkShift"))
 
-        # Create play button
-        self.btn_play = QtGui.QPushButton('Plot',self.groupBox_off4)
-        self.btn_play.setGeometry(10,20,73,23)
-        #self.btn_play.setIcon(QtGui.QIcon('play.jpg'))
-        self.btn_play.setIconSize(QtCore.QSize(45,45))
+        self.btn_play = QtGui.QPushButton('Plot', self.groupBox_off4)
+        self.btn_play.setGeometry(10, 20, 73, 23)
+        self.btn_play.setIconSize(QtCore.QSize(45, 45))
 
-
-        # Create play button
         self.setRefBtn_off = QtGui.QPushButton('Set Ref Fix',self.groupBox_off4)
-        self.setRefBtn_off.setGeometry(10,70,73,23)
-        #self.btn_play.setIcon(QtGui.QIcon('play.jpg'))
-        self.setRefBtn_off.setIconSize(QtCore.QSize(45,45))
+        self.setRefBtn_off.setGeometry(10, 70, 73, 23)
+        self.setRefBtn_off.setIconSize(QtCore.QSize(45, 45))
 
-
-
-        """# Create stop button
-        self.btn_stop = QtGui.QPushButton('',self.Offline)
-        self.btn_stop.setGeometry(x-35,y,30,30)
-        self.btn_stop.setIcon(QtGui.QIcon('stop.jpg'))
-        self.btn_stop.setIconSize(QtCore.QSize(44,44))"""
-
-        # Create textbox
         self.logOutput_off = QTextEdit(self.Offline)
         self.logOutput_off.setReadOnly(True)
         self.logOutput_off.setLineWrapMode(QTextEdit.NoWrap)
         self.logOutput_off.moveCursor(QTextCursor.End)
-        self.logOutput_off.setGeometry(700,350,500,200)
+        self.logOutput_off.setGeometry(700, 350, 500, 200)
 
         font = self.logOutput_off.font()
         font.setFamily("Courier")
         font.setPointSize(10)
 
         self.logOutput_off.setCurrentFont(font)
-        #logOutput.setTextColor(color)
-        self.logOutput_off.insertPlainText("Analise de dados - HLS Fogale" + '\n')
-        self.logOutput_off.insertPlainText("Selecione no calendario o intervalo desejado para analise" + '\n')
+        self.logOutput_off.insertPlainText("Offline plot for HLS data stored in 'Data' folder" + '\n\n')
+        self.logOutput_off.insertPlainText("Select in calendar the period for analysis" + '\n')
 
-        #Input dialog
-        #self.Dlg = QInputDialog.getItem(None,"Define Metodo","Selecione forma de analise", ["Variacao Media individual", "Variacao por referencia", "Valor Absoluto", "Variacao Diaria"])
-
-        """Aba 'Online'"""
+        ## 'Online plot' tab ##
         self.Online = QtGui.QWidget()
         self.Online.setObjectName(_fromUtf8("Online"))
         self.tabWidget.addTab(self.Online, _fromUtf8(""))
-        #self.groupBox_3 = QtGui.QGroupBox(self.Monitor)
-        #self.groupBox_3.setGeometry(QtCore.QRect(5, 10, 816, 326))
-        #self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
         self.widget_on = SimplePlot_on(self.Online)
-        self.widget_on.setGeometry(QtCore.QRect(10, 10, 1250, 410)) #796, 360
+        self.widget_on.setGeometry(QtCore.QRect(10, 10, 1250, 410))
         self.widget_on.setObjectName(_fromUtf8("widget"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Online), _translate("MainWindow", "Online", None))
 
-
-        """self.vb = CustomViewBox()
-        self.Online2 = QtGui.QWidget()
-        self.Online2.setObjectName(_fromUtf8("Online2"))
-        self.tabWidget.addTab(self.Online2, _fromUtf8(""))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Online2), _translate("MainWindow", "Online2", None))
-        self.pw = pg.PlotWidget(self.Online2, enableMenu=True, title="PlotItem with custom axis and ViewBox<br>Menu disabled, mouse behavior changed: left-drag to zoom, right-click to reset zoom")
-        self.pw.setGeometry(QtCore.QRect(5, 10, 600, 200))
-        dates = np.arange(8) * (3600*24*356)
-        #self.pw.plot(x=dates, y=[1,6,2,4,3,5,6,8], symbol='o')"""
-        #nova implementação
-        #self.groupBox_2 = QtGui.QGroupBox(self.Monitor)
-        #self.groupBox_2.setGeometry(QtCore.QRect(10, 145, 806, 446))
-        #self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
-        #self.groupBox = QtGui.QGroupBox(self.groupBox_2)
-        #self.groupBox.setGeometry(QtCore.QRect(550, 15, 211, 111))
-        #self.groupBox.setObjectName(_fromUtf8("groupBox"))
-        #self.PortBox = QtGui.QComboBox(self.groupBox)
-        #self.PortBox.setGeometry(QtCore.QRect(20, 45, 69, 22))
-        #self.PortBox.setObjectName(_fromUtf8("PortBox"))
-        """Botao de plot, ja obsoleto"""
-        """self.PlotButton = QtGui.QPushButton(self.Online)
-        self.PlotButton.setGeometry(QtCore.QRect(440, 430, 75, 23))
-        self.PlotButton.setObjectName(_fromUtf8("PlotButton"))
-        self.PlotButton.setText(_translate("MainWindow", "Plot", None))"""
-        """Botao setScale do plot"""
         self.setScaleBtn = QtGui.QPushButton(self.Online)
-        self.setScaleBtn.setGeometry(QtCore.QRect(530,490,75,23))
+        self.setScaleBtn.setGeometry(QtCore.QRect(530, 490, 75, 23))
         self.setScaleBtn.setObjectName(_fromUtf8("setScaleButton"))
         self.setScaleBtn.setText(_translate("MainWindow", "Set scale", None))
-        """Botao setAutoScale do plot"""
+
         self.setAutoScaleBtn = QtGui.QPushButton(self.Online)
-        self.setAutoScaleBtn.setGeometry(QtCore.QRect(530,520,75,23))
+        self.setAutoScaleBtn.setGeometry(QtCore.QRect(530, 520, 75, 23))
         self.setAutoScaleBtn.setObjectName(_fromUtf8("setAutoScaleButton"))
         self.setAutoScaleBtn.setText(_translate("MainWindow", "Autoscale", None))
 
-        """PlotBox para selecao de plot 'nivel' ou 'temp'"""
         self.plotBox_on = QtGui.QComboBox(self.Online)
         self.plotBox_on.setGeometry(QtCore.QRect(450, 520, 75, 23))
         self.plotBox_on.setObjectName(_fromUtf8("plotBox"))
-        #NOVO{
+
         self.list = ["Nível", "Temperatura"]
-        """adiciona lista de sensores ao menu dos Plots"""
         self.plotBox_on.addItems(self.list)
 
-
-        """Botao de plot do valor absoluto de todos os sensores"""
         self.plotRefFixBtn = QtGui.QPushButton(self.Online)
         self.plotRefFixBtn.setGeometry(QtCore.QRect(30, 480, 75, 23))
         self.plotRefFixBtn.setObjectName(_fromUtf8("PlotButton6"))
         self.plotRefFixBtn.setText(_translate("MainWindow", "Valores Fixos", None))
-        """Botao de plot dos valores dos sensores em relação a um sensor"""
+
         self.plotRefSensorBtn = QtGui.QPushButton(self.Online)
         self.plotRefSensorBtn.setGeometry(QtCore.QRect(30, 510, 75, 23))
         self.plotRefSensorBtn.setObjectName(_fromUtf8("PlotButton3"))
         self.plotRefSensorBtn.setText(_translate("MainWindow", "Sensor", None))
-        """Botao de plot dos valores dos sensores em relação a uma média geral"""
+
         self.plotRefMedGBtn = QtGui.QPushButton(self.Online)
         self.plotRefMedGBtn.setGeometry(QtCore.QRect(30, 540, 75, 23))
         self.plotRefMedGBtn.setObjectName(_fromUtf8("PlotButton4"))
         self.plotRefMedGBtn.setText(_translate("MainWindow", "Média Geral", None))
-        """Botao de plot dos valores dos sensores em relação a uma média individual"""
+
         self.plotRefMedIBtn = QtGui.QPushButton(self.Online)
         self.plotRefMedIBtn.setGeometry(QtCore.QRect(30, 570, 75, 23))
         self.plotRefMedIBtn.setObjectName(_fromUtf8("PlotButton5"))
         self.plotRefMedIBtn.setText(_translate("MainWindow", "Média Local", None))
-        """Botao de plot do valor absoluto de todos os sensores"""
+"
         self.plotAbsBtn = QtGui.QPushButton(self.Online)
         self.plotAbsBtn.setGeometry(QtCore.QRect(30, 600, 75, 23))
         self.plotAbsBtn.setObjectName(_fromUtf8("PlotButton7"))
         self.plotAbsBtn.setText(_translate("MainWindow", "Absoluta", None))
 
-        """Botao de stop plot"""
-        # Create stop2 button
         self.btn_stop2 = QtGui.QPushButton('',self.Online)
         self.btn_stop2.setGeometry(450, 490, 75, 23)
         self.btn_stop2.setText("Stop Plot")
@@ -806,7 +526,6 @@ class Ui_MainWindow(object):
         self.setRef_onBtn.setObjectName(_fromUtf8("PlotButton8"))
         self.setRef_onBtn.setText(_translate("MainWindow", "Set Ref", None))
 
-        """plotBlox para seleção do sensor de referencia"""
         self.plotBoxSens_on = QtGui.QComboBox(self.Online)
         self.plotBoxSens_on.setGeometry(QtCore.QRect(115, 512, 75, 18))
         self.plotBoxSens_on.setObjectName(_fromUtf8("PlotBoxSensor"))
@@ -828,61 +547,38 @@ class Ui_MainWindow(object):
         self.cmpLabel.setObjectName(_fromUtf8("label_6"))
         self.cmpLabel.setText(_translate("MainWindow", "Number of Graph Points:", None))
 
-        #self.groupBox_7 = QtGui.QGroupBox(self.Monitor)
-        #self.groupBox_7.setGeometry(QtCore.QRect(10, 15, 806, 121))
-        #self.groupBox_7.setObjectName(_fromUtf8("groupBox_7")
-
-
+        # checkplots
         x=200
         y=570
-        """checkPlots"""
-        #self.PlotBox1 = QtGui.QComboBox(self.Online)
-        #self.PlotBox1.setGeometry(QtCore.QRect(410, 500, 69, 22))
-        #self.PlotBox1.setObjectName(_fromUtf8("PlotBox1"))
         self.checkPlot1_on = QtGui.QCheckBox(self.Online)
         self.checkPlot1_on.setGeometry(QtCore.QRect(x, y, 70, 17))
         self.checkPlot1_on.setChecked(False)
         self.checkPlot1_on.setObjectName(_fromUtf8("checkPlot1_on"))
-        #self.checkPlot1_on.setText(_translate("MainWindow", var.disp_sensores[0][0] , None))
-        #self.PlotBox2 = QtGui.QComboBox(self.Online)
-        #self.PlotBox2.setGeometry(QtCore.QRect(505, 500, 69, 22))
-        #self.PlotBox2.setObjectName(_fromUtf8("PlotBox2"))
+
         self.checkPlot2_on = QtGui.QCheckBox(self.Online)
         self.checkPlot2_on.setGeometry(QtCore.QRect(x+80, y, 70, 17))
         self.checkPlot2_on.setObjectName(_fromUtf8("checkPlot2"))
-        #self.PlotBox3 = QtGui.QComboBox(self.Online)
-        #self.PlotBox3.setGeometry(QtCore.QRect(600, 500, 69, 22))
-        #self.PlotBox3.setObjectName(_fromUtf8("PlotBox3"))
+
         self.checkPlot3_on = QtGui.QCheckBox(self.Online)
         self.checkPlot3_on.setGeometry(QtCore.QRect(x+160, y, 70, 17))
         self.checkPlot3_on.setObjectName(_fromUtf8("checkPlot3"))
-        #self.PlotBox4 = QtGui.QComboBox(self.Online)
-        #self.PlotBox4.setGeometry(QtCore.QRect(695, 500, 69, 22))
-        #self.PlotBox4.setObjectName(_fromUtf8("PlotBox4"))
+
         self.checkPlot4_on = QtGui.QCheckBox(self.Online)
         self.checkPlot4_on.setGeometry(QtCore.QRect(x+240, y, 70, 17))
         self.checkPlot4_on.setObjectName(_fromUtf8("checkPlot4"))
-        #self.PlotBox5 = QtGui.QComboBox(self.Online)
-        #self.PlotBox5.setGeometry(QtCore.QRect(410, 550, 69, 22))
-        #self.PlotBox5.setObjectName(_fromUtf8("PlotBox5"))
+
         self.checkPlot5_on = QtGui.QCheckBox(self.Online)
         self.checkPlot5_on.setGeometry(QtCore.QRect(x+320, y, 70, 17))
         self.checkPlot5_on.setObjectName(_fromUtf8("checkPlot5"))
-        #self.PlotBox6 = QtGui.QComboBox(self.Online)
-        #self.PlotBox6.setGeometry(QtCore.QRect(505, 550, 69, 22))
-        #self.PlotBox6.setObjectName(_fromUtf8("PlotBox6"))
+
         self.checkPlot6_on = QtGui.QCheckBox(self.Online)
         self.checkPlot6_on.setGeometry(QtCore.QRect(x+400, y, 70, 17))
         self.checkPlot6_on.setObjectName(_fromUtf8("checkPlot6"))
-        #self.PlotBox7 = QtGui.QComboBox(self.Online)
-        #self.PlotBox7.setGeometry(QtCore.QRect(600, 550, 69, 22))
-        #self.PlotBox7.setObjectName(_fromUtf8("PlotBox7"))
+
         self.checkPlot7_on = QtGui.QCheckBox(self.Online)
         self.checkPlot7_on.setGeometry(QtCore.QRect(x+480, y, 70, 17))
         self.checkPlot7_on.setObjectName(_fromUtf8("checkPlot7"))
-        #self.PlotBox8 = QtGui.QComboBox(self.Online)
-        #self.PlotBox8.setGeometry(QtCore.QRect(695, 550, 69, 22))
-        #self.PlotBox8.setObjectName(_fromUtf8("PlotBox8"))
+
         self.checkPlot8_on = QtGui.QCheckBox(self.Online)
         self.checkPlot8_on.setGeometry(QtCore.QRect(x+560, y, 70, 17))
         self.checkPlot8_on.setObjectName(_fromUtf8("checkPlot8"))
@@ -911,46 +607,33 @@ class Ui_MainWindow(object):
         self.checkPlot16_on.setGeometry(QtCore.QRect(x+560, y+30, 70, 17))
         self.checkPlot16_on.setObjectName(_fromUtf8("checkPlot16"))
 
-        # scaleMinY textbox
         self.logMinY = QTextEdit(self.Online)
         self.logMinY.setReadOnly(False)
         self.logMinY.setLineWrapMode(QTextEdit.NoWrap)
         self.logMinY.moveCursor(QTextCursor.End)
-        self.logMinY.setGeometry(640,520,70,20)
+        self.logMinY.setGeometry(640, 520, 70, 20)
 
-        # scaleMaxY textbox 600,440,75,23
         self.logMaxY = QTextEdit(self.Online)
         self.logMaxY.setReadOnly(False)
         self.logMaxY.setLineWrapMode(QTextEdit.NoWrap)
         self.logMaxY.moveCursor(QTextCursor.End)
-        self.logMaxY.setGeometry(640,490,70,20)
+        self.logMaxY.setGeometry(640, 490, 70, 20)
 
-        # scaleMinX textbox 600,470,75,23
         self.logMinX = QTextEdit(self.Online)
         self.logMinX.setReadOnly(False)
         self.logMinX.setLineWrapMode(QTextEdit.NoWrap)
         self.logMinX.moveCursor(QTextCursor.End)
-        self.logMinX.setGeometry(720,520,100,20)
+        self.logMinX.setGeometry(720, 520, 100, 20)
 
-        # scaleMaxX textbox 600,440,75,23
         self.logMaxX = QTextEdit(self.Online)
         self.logMaxX.setReadOnly(False)
         self.logMaxX.setLineWrapMode(QTextEdit.NoWrap)
         self.logMaxX.moveCursor(QTextCursor.End)
-        self.logMaxX.setGeometry(720,490,100,20)
+        self.logMaxX.setGeometry(720, 490, 100, 20)
 
-        # log para se colocar a data que se pretende ver no gráfico
-        """self.logDate = QTextEdit(self.Online)
-        self.logDate.setReadOnly(False)
-        self.logDate.setLineWrapMode(QTextEdit.NoWrap)
-        self.logDate.moveCursor(QTextCursor.End)
-        self.logDate.setGeometry(830,490,120,20)"""
-
-        """PlotBox para selecao da data para o 'set scale'"""
         self.plotBox_data = QtGui.QComboBox(self.Online)
         self.plotBox_data.setGeometry(QtCore.QRect(830, 490, 100, 23))
         self.plotBox_data.setObjectName(_fromUtf8("plotBox_data"))
-        #NOVO{
 
         self.textMax = QtGui.QLabel("Max", self.Online)
         self.textMax.setGeometry(615, 493, 20, 15)
@@ -962,7 +645,6 @@ class Ui_MainWindow(object):
         self.textY.setGeometry(640, 473, 30, 15)
         self.textData = QtGui.QLabel("Data:", self.Online)
         self.textData.setGeometry(830, 473, 30, 15)
-
 
         font = self.logMaxY.font()
         font.setFamily("Courier")
@@ -977,22 +659,20 @@ class Ui_MainWindow(object):
         self.logMaxX.setCurrentFont(font)
         self.logMaxX.insertPlainText("0")
 
-        # Create textbox para aba 'Online'
         self.logOutput_on = QTextEdit(self.Online)
         self.logOutput_on.setReadOnly(True)
         self.logOutput_on.setLineWrapMode(QTextEdit.NoWrap)
         self.logOutput_on.moveCursor(QTextCursor.End)
-        self.logOutput_on.setGeometry(835,520,430,100)
+        self.logOutput_on.setGeometry(835, 520, 430, 100)
 
         font = self.logOutput_on.font()
         font.setFamily("Courier")
         font.setPointSize(10)
 
         self.logOutput_on.setCurrentFont(font)
-        #logOutput.setTextColor(color)
-        self.logOutput_on.insertPlainText("Analise de dados - HLS Fogale" + '\n')
+        self.logOutput_on.insertPlainText("Realtime plotting - HLS Fogale" + '\n')
 
-        """Textos para checkPlots"""
+        # checkplot texts
         x = 217
         y = 570
         font1 = QFont()
@@ -1004,11 +684,9 @@ class Ui_MainWindow(object):
         self.text2.setFont(font1)
         self.text2.setGeometry(140, y+30, 50, 15)
 
-
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -1340,7 +1018,6 @@ class Ui_MainWindow(object):
         self.checkPlot8.setText(_translate("MainWindow", "Plot 8:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Preferences), _translate("MainWindow", "Preferences", None))
 
-        """NOVO"""
         self.checkPlot1_on.setText(_translate("MainWindow", var.disp_sensores[0][0] , None))
         self.checkPlot2_on.setText(_translate("MainWindow", var.disp_sensores[0][1] , None))
         self.checkPlot3_on.setText(_translate("MainWindow", var.disp_sensores[0][2] , None))
@@ -1357,17 +1034,17 @@ class Ui_MainWindow(object):
         self.checkPlot14_on.setText(_translate("MainWindow", var.disp_sensores[1][5] , None))
         self.checkPlot15_on.setText(_translate("MainWindow", var.disp_sensores[1][6] , None))
         self.checkPlot16_on.setText(_translate("MainWindow", var.disp_sensores[1][7] , None))
-        self.checkCmp_on.setText(_translate("MainWindow", "Limitar número de pontos" , None))
+        self.checkCmp_on.setText(_translate("MainWindow", "Limit plot points" , None))
         self.checkShift_off.setText(_translate("MainWindow", "Set Shift ON" , None))
 
-        self.groupBox_off1.setTitle(_translate("MainWindow", "Propriedades do plot", None))
-        self.groupBox_off2.setTitle(_translate("MainWindow", "Opções de referência", None))
-        self.groupBox_off3.setTitle(_translate("MainWindow", "Preferências", None))
-        self.groupBox_off4.setTitle(_translate("MainWindow", "Ações", None))
+        self.groupBox_off1.setTitle(_translate("MainWindow", "Plot proprerties", None))
+        self.groupBox_off2.setTitle(_translate("MainWindow", "Referency options", None))
+        self.groupBox_off3.setTitle(_translate("MainWindow", "Preference", None))
+        self.groupBox_off4.setTitle(_translate("MainWindow", "Actions", None))
 
         self.logDateTime_off.setToolTip(_translate("MainWindow", "Set the date and time of the data that is wanted to be de referency values. Format: HH:MM:SS dd/mm/yyyy", None))
         self.text3.setToolTip(_translate("MainWindow", "Set the date and time of the data that is wanted to be de referency values. Format: HH:MM:SS dd/mm/yyyy", None))
 
 
-from PlotGUI_Qwt_Multi_v3 import SimplePlot
-from PlotGUI_Qwt_Multi_v3 import SimplePlot_on
+from Plot_definitions import SimplePlot
+from Plot_definitions import SimplePlot_on

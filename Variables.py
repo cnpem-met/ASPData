@@ -28,18 +28,18 @@ class Var(object):
         """lista de referencia da disposicao dos sensores"""
         self.disp_sensores =  [["H7DC_35", "H7DC_48", "H7DC_39", "H7DC_32",
                                "H7DC_34", "H7DC_50", "H7DC_51", "H7DC_52"],
-                               ["H7DC_45", "H7DC_59", "H7DC_56", "H7DC_44",  
-                                "H7DC_33", "H7DC_43", "H7DC_36", "N/C"], 
-                               ["H7DC_38", "H7DC_57", "H7DC_47", "H7DC_55",  
-                                "H7DC_40", "N/C", "N/C", "N/C"], 
-                               ["N/C", "N/C", "N/C", "N/C",  
+                               ["H7DC_45", "H7DC_59", "H7DC_56", "H7DC_44",
+                                "H7DC_33", "H7DC_43", "H7DC_36", "N/C"],
+                               ["H7DC_38", "H7DC_57", "H7DC_47", "H7DC_55",
+                                "H7DC_40", "N/C", "N/C", "N/C"],
+                               ["N/C", "N/C", "N/C", "N/C",
                                 "N/C", "N/C", "N/C", "N/C"]]
 
 
         """variáveis para peso na média caminhante; a soma das duas deve ser 1"""
         self.wlast = 0.9
         self.wcurr = 0.1
-        
+
         """cada elemento do vetor v possui dados sobre as 16 tensões lidas
         e o tempo no qual as medidas foram tomadas, os índices"""
         self.v1 = []
@@ -49,7 +49,7 @@ class Var(object):
 
         self.D = np.array([[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                            [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]], float)
-        
+
         self.D1 = np.array([])
         self.D2 = np.array([])
         self.D3 = np.array([])
@@ -72,7 +72,7 @@ class Var(object):
         ###Início das configurações salvas em arquivos###
         """intervalo de aquisição de dados em segundos"""
         self.t_aq = 5
-        
+
         """número de medidas salvas na memória disponíveis para gráfico"""
         self.cmp = 1000
         self.cmp_on = 1000 #novo
@@ -87,27 +87,27 @@ class Var(object):
                             [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], float)
         self.To = np.array([[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], float)
-        
+
         """Valores médios de nível e temperatura (média total)"""
         self.Davg = np.array([[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], float)
         self.Tavg = np.array([[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], float)        
+                            [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], float)
         ###Fim das configurações salvas em arquivos###
 
-        
+
         ###Declaração dos comandos###
         """os dados são enviados na forma EECCDDSS, onde:
         EE = endereço do rack com 2 caracteres de hexa;
         CC = comando com 2 caracteres de hexa;
         DD = dados do comando, podendo ter 0 caracteres;
         SS = checksum com 2 caracteres de hexa"""
-        
+
         """comando F0, rack reset"""
         self.data10 = '01F00F'
         self.data20 = '02F00E'
         self.data30 = '03F00D'
-        self.data40 = '04F00C' 
+        self.data40 = '04F00C'
 
         """comando F1, rack connect"""
         self.data11 = '01F10E'
@@ -117,9 +117,9 @@ class Var(object):
 
         """comando F2, rack disconnect"""
         self.data12 = '01F20D'
-        self.data22 = '02F20C' 
+        self.data22 = '02F20C'
         self.data32 = '03F20B'
-        self.data42 = '04F20A' 
+        self.data42 = '04F20A'
 
         """comando 30, acquisition of values"""
         self.data13 = '013008C7'
@@ -176,7 +176,7 @@ class Var(object):
         self.H7DC_061 = np.poly1d([1.453e-4, -2.317e-3, 5.0852e-1, 5.0001])  #
         self.H7DC_062 = np.poly1d([0.000000, 0.0000000, 0.0000000, 0.0000])  #
         self.H7DC_063 = np.poly1d([0.000000, 0.0000000, 0.0000000, 0.0000])  #
-        
+
         """self.D_Rack é uma matriz 2x2 contendo os polinomios de conversão de cada sensor,
         onde o elemento i+1 (linha) é o índice do Rack e o elemento j (coluna) é o sensor"""
                     ###Configuração na ordem padrão dos sensores###
@@ -192,13 +192,13 @@ class Var(object):
         #=============================================================================#
 
                     ### Configuração da atual disposição dos sensores na bancada METRO (SÓ UM RACK) ###
-        self.D_Rack = [[self.H7DC_035, self.H7DC_048, self.H7DC_039, self.H7DC_032,  
-                        self.H7DC_034, self.H7DC_050, self.H7DC_051, self.H7DC_052], 
-                       [self.H7DC_045, self.H7DC_059, self.H7DC_056, self.H7DC_044,  
-                        self.H7DC_033, self.H7DC_043, self.H7DC_036, self.H7DC_062], 
-                       [self.H7DC_038, self.H7DC_057, self.H7DC_047, self.H7DC_055,  
-                        self.H7DC_040, self.H7DC_062, self.H7DC_062, self.H7DC_062], 
-                       [self.H7DC_062, self.H7DC_062, self.H7DC_062, self.H7DC_062,  
+        self.D_Rack = [[self.H7DC_035, self.H7DC_048, self.H7DC_039, self.H7DC_032,
+                        self.H7DC_034, self.H7DC_050, self.H7DC_051, self.H7DC_052],
+                       [self.H7DC_045, self.H7DC_059, self.H7DC_056, self.H7DC_044,
+                        self.H7DC_033, self.H7DC_043, self.H7DC_036, self.H7DC_062],
+                       [self.H7DC_038, self.H7DC_057, self.H7DC_047, self.H7DC_055,
+                        self.H7DC_040, self.H7DC_062, self.H7DC_062, self.H7DC_062],
+                       [self.H7DC_062, self.H7DC_062, self.H7DC_062, self.H7DC_062,
                         self.H7DC_062, self.H7DC_062, self.H7DC_062, self.H7DC_062]]
                     ### ideia: implementar isso automaticamente, junto a 'sensor_list' ###
 
@@ -214,6 +214,42 @@ class Var(object):
         self.Cdil_vessel = 17 #ppm/ºC
         self.Pt = 11 #mm; Ponto de equilíbrio da água
         self.Cm = self.Hdiff*self.Cdil_vessel*1e-6*(self.T-self.Tref)
+
+        ## variveis para plot ##
+        self.refD1 = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.refT1 = [0,0,0,0,0,0,0,0]
+        self.refD2 = [0,0,0,0,0,0,0,0]
+        self.refT2 = [0,0,0,0,0,0,0,0]
+        self.refD3 = [0,0,0,0,0,0,0,0]
+        self.refT3 = [0,0,0,0,0,0,0,0]
+        self.refD4 = [0,0,0,0,0,0,0,0]
+        self.refT4 = [0,0,0,0,0,0,0,0]
+
+        self.plotFlag = False
+
+        self.rack1 = 0
+        self.rack2 = 0
+        self.rack3 = 0
+        self.rack4 = 0
+
+        self.posSens = [-420,-80, 360, 750, 1100, 1450, 1880, 2260]
+
+        self.sumD1 = [0,0,0,0,0,0,0,0,0]
+        self.sumT1 = [0,0,0,0,0,0,0,0,0]
+        self.sumD2 = [0,0,0,0,0,0,0,0,0]
+        self.sumT2 = [0,0,0,0,0,0,0,0,0]
+        self.sumD3 = [0,0,0,0,0,0,0,0,0]
+        self.sumT3 = [0,0,0,0,0,0,0,0,0]
+        self.sumD4 = [0,0,0,0,0,0,0,0,0]
+        self.sumT4 = [0,0,0,0,0,0,0,0,0]
+
+        self.scaleMinY = 0
+        self.scaleMaxY = 0
+        self.scaleMinX = 0
+        self.scaleMaxX = 0
+
+        self.flag_freeToPlot_off = False
+
         ###Fim da declaração de váriáveis globais####
 
 

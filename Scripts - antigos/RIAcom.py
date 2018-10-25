@@ -1,11 +1,37 @@
-import serial, time, sys, os, threading
+"""ERRROS
+- 'Preferences': Botao de load e save parameters ta zoado
+- 'Offline':
+- 'Online':
+    - o plot, depois de um longo periodo de aquisicao, fica comprometido
+      no sentido de que ele nao plota mais automaticamente
+    - depois de um longo tempo, vetor var.....Data[0].x e y começam a pegar muito
+      mais valores em cada leitura em vez de 1 só
+- ***PROGRAMA SENDO INTERROMPIDO POR ERRO DE EXECUÇÃO
+    - colocar 'try' e 'except' para achar o erro
+"""
+
+
+import serial, time, sys, os, threading, random
 import numpy as np
-from Variaveis import var
-from Fogale_UI import Ui_MainWindow
+from Variaveis_v2 import var #novo
+from Fogale_UI_v4 import Ui_MainWindow #novo
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import QObject, pyqtSignal #novo
+#from PyQt4.QtGui import * #NOVO
 from serial.tools import list_ports
 import PyQt4.Qwt5 as Qwt
-from PlotGUI_Qwt_Multi import dataclass
+
+from PlotGUI_Qwt_Multi_v3 import dataclass
+#NOVO{
+#from PlotGUI_Qwt_Multi import SimplePlot
+from Auxiliar import aux
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas #NOVO
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar #NOVO
+import matplotlib.pyplot as plt# NOVO
+#from python_pyqt_NewVersion_v6 import * #NOVO
+from python_pyqt_NewVersion_v7 import plot
+#from teste import plot
+#}
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -13,9 +39,14 @@ except AttributeError:
     def _fromUtf8(s):
         return s
 
+sys.stderr = open("errlog.txt", "w")
+"""if ( sys.platform == 'win32' and sys.executable.split( '\\' )[-1] == 'pythonw.exe'):
+    sys.stdout = open(os.devnull, 'w')
+    sys.stderr = open(os.devnull, 'w')"""
 
 """implementar médias gerais"""
 """aplicar conversão e correção de temperatura"""
+
 
 class RIA(QtGui.QMainWindow):
     def __init__(self, parent = None):
@@ -27,6 +58,7 @@ class RIA(QtGui.QMainWindow):
 
     ###início das funções relacionadas à interface###
     def ui_init(self):
+        plot.set_dataList()
         self.list_ports()
         self.load_param()
 
@@ -135,6 +167,114 @@ class RIA(QtGui.QMainWindow):
         QtCore.QObject.connect(var.ria.ui.cmp, QtCore.SIGNAL("valueChanged (int)"),
                                                      self.set_cmp)
 
+        #NOVO{
+        val = ""
+        self.list_val= []
+        """adiciona valores D32, D33, ..., D47 ao plotBox_off da aba 'Offline'"""
+        for k in range (len(var.disp_sensores)):
+            val = var.disp_sensores[k]
+            self.list_val = np.append(self.list_val, val)
+        var.ria.ui.plotBoxSens_off.addItems(self.list_val)
+        
+        """adiciona lista de sensores que podem ser usados como referencia"""
+        with open('parameters.dat', 'r') as f:
+            lines = f.readlines()
+            if lines[3] == 'True\n':
+                var.ria.ui.plotBoxSens_on.addItems(var.disp_sensores[0])
+            if lines[4] == 'True\n':
+                var.ria.ui.plotBoxSens_on.addItems(var.disp_sensores[1])
+            if lines[5] == 'True\n':
+                var.ria.ui.plotBoxSens_on.addItems(var.disp_sensores[2])
+            if lines[6] == 'True\n':
+                var.ria.ui.plotBoxSens_on.addItems(var.disp_sensores[3])
+
+        plot.set_plot1_on()
+        plot.set_plot2_on()
+        plot.set_plot3_on()
+        plot.set_plot4_on()
+        plot.set_plot5_on()
+        plot.set_plot6_on()
+        plot.set_plot7_on()
+        plot.set_plot8_on()
+
+        plot.set_plot9_on()
+        plot.set_plot10_on()
+        plot.set_plot11_on()
+        plot.set_plot12_on()
+        plot.set_plot13_on()
+        plot.set_plot14_on()
+        plot.set_plot15_on()
+        plot.set_plot16_on()
+
+        
+        """conecta sinais às respectivas funções"""
+        var.ria.ui.cal.clicked[QtCore.QDate].connect(plot.showDate)
+        var.ria.ui.btn1.clicked[bool].connect(plot.getDate_ini)
+        var.ria.ui.btn2.clicked[bool].connect(plot.getDate_fim)
+        var.ria.ui.btn_play.clicked[bool].connect(plot.startPlot_off)
+        var.ria.ui.btn_stop2.clicked[bool].connect(plot.stopPlot)
+        var.ria.ui.setScaleBtn.clicked[bool].connect(plot.setScalePlot)
+        var.ria.ui.setAutoScaleBtn.clicked[bool].connect(plot.setAutoScalePlot)
+        var.ria.ui.plotAbsBtn_off.clicked[bool].connect(plot.startPlot_abs_off)
+        var.ria.ui.plotRefSensorBtn_off.clicked[bool].connect(plot.startPlot_refSensor_off)
+        var.ria.ui.plotRefFixaBtn_off.clicked[bool].connect(plot.startPlot_refFixa_off)
+        var.ria.ui.plotRefMedGBtn_off.clicked[bool].connect(plot.startPlot_refMediaG_off)
+        var.ria.ui.setRefBtn_off.clicked[bool].connect(plot.setRef_off)
+
+
+        QtCore.QObject.connect(var.ria.ui.plotAbsBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.startPlot_abs)
+        QtCore.QObject.connect(var.ria.ui.plotRefSensorBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.startPlot_refSensor)
+        QtCore.QObject.connect(var.ria.ui.plotRefMedGBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.startPlot_refMediaG)
+        QtCore.QObject.connect(var.ria.ui.plotRefMedIBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.startPlot_refMediaI)
+        QtCore.QObject.connect(var.ria.ui.plotRefFixBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.startPlot_refFixa)
+        QtCore.QObject.connect(var.ria.ui.checkPlot1_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot1_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot2_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot2_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot3_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot3_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot4_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot4_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot5_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot5_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot6_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot6_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot7_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot7_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot8_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot8_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot9_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot9_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot10_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot10_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot11_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot11_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot12_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot12_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot13_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot13_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot14_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot14_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot15_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot15_on)
+        QtCore.QObject.connect(var.ria.ui.checkPlot16_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_plot16_on)
+        QtCore.QObject.connect(var.ria.ui.plotBox_on, QtCore.SIGNAL("currentIndexChanged(int)"),
+                                                     plot.plotBox_act)
+        QtCore.QObject.connect(var.ria.ui.cmp_on, QtCore.SIGNAL("valueChanged (int)"),
+                                                     plot.set_cmp_on)
+        QtCore.QObject.connect(var.ria.ui.setRef_onBtn, QtCore.SIGNAL("clicked()"),
+                                                     plot.setRef_on)
+        QtCore.QObject.connect(var.ria.ui.checkCmp_on, QtCore.SIGNAL("stateChanged(int)"),
+                                                     plot.set_checkCmp_on)
+        QtCore.QObject.connect(var.ria.ui.plotBox_data, QtCore.SIGNAL("currentIndexChanged(int)"),
+                                                     plot.plotBox_dataAct)
+        #NOVO}
 
     #muda valor de tempo de aquisição de dados
     def set_t_aq(self):
@@ -164,7 +304,7 @@ class RIA(QtGui.QMainWindow):
         except:
             raise
             QtGui.QMessageBox.information(self, "Serial error",
-             "Couldn't open communication. Please check if it's aready open.")
+             "Couldn't open communication. Please check if it's already open.")
 
     #fecha comunicação serial
     def close_com(self):
@@ -920,8 +1060,7 @@ class RIA(QtGui.QMainWindow):
             self.vout = np.append(self.vout, self.output)
                 
         self.v = np.reshape(self.vout, (8,2))
-        print('T:', self.T[1:])
-        print('timesec:', self.timesec)
+
         """correção de nível por dilatação térmica da água:"""
         self.Cag = (var.F(self.T[1:]) - var.F(np.ones(8)*var.Tref))/(1e5-var.F(self.T[1:]))
         self.Cdag = (np.ones(8)*var.Hdiff - self.D[1:] - np.ones(8)*var.Pt)*self.Cag
@@ -938,11 +1077,11 @@ class RIA(QtGui.QMainWindow):
     def send(self, data):
         self.response = ""
         self.to_write = self.hex_to_str(data)
-        print('\n'+'Tx: ' + self.to_write)
+        #print('\n'+'Tx: ' + self.to_write)
         self.ser.write(self.to_write.encode("utf-8"))
         time.sleep(0.3)
         self.response = self.ser.read(200).decode("utf-8")
-        print('\n'+'Rx: ' + self.response)
+        #print('\n'+'Rx: ' + self.response)
         self.check_response(self.response)
 
     def send1(self, data):
@@ -1021,7 +1160,7 @@ class RIA(QtGui.QMainWindow):
                     except:
                         print("erro em v_converter")
                         raise
-                    print(self.v)
+                    #print(self.v)
                     if i == 1:
                         """atualiza D1"""
                         try:
@@ -1077,11 +1216,15 @@ class RIA(QtGui.QMainWindow):
                     print('erro em plot line 1062')
             else:
                 print('Endereço %i não existe \n' %i)
-        
 
-        self.save_log(address)
+        try:
+            #aux.plotFlagRIAcom = True #NOVO - Flag para liberar o plot dos racks simultaneamente no 'Online'
+            self.save_log(address)
+            #aux.plotFlagRIAcom = False #NOVO        
+        except:
+            print("Erro FlagRIAcom")
+            raise
         
-                
     #checa status do(s) rack(s)
     def check_status(self, address):
         for i in address:
@@ -1104,7 +1247,8 @@ class RIA(QtGui.QMainWindow):
         self.date = time.strftime("%Y_%m_%d", time.localtime()) #adquire data
         self.date1 = self.date.replace('_','/')
         self.time = time.strftime("%H:%M:%S", time.localtime()) #adquire hora
-            
+
+        self.dir = 'Data/'
         """salva dados em arquivos nomeados por data, na forma:
         data, hora, D1, D2, D3, D4, D5, D6, D7, D8, T1, T2, T3, T4, T5, T6, T7, T8"""        
         for i in address:
@@ -1114,8 +1258,8 @@ class RIA(QtGui.QMainWindow):
                     if i == 1:
                         len(var.D1[0])  #teste para ver se há mais de um elemento em D                  
                         try:
-                            f = open('rack'+ str(i) + '_' + self.date + '.dat', 'r')
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                            f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D1[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1123,10 +1267,18 @@ class RIA(QtGui.QMainWindow):
                                     f.write(str(a)+'\t')
                                 f.write('\n')
                         except:
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
-                                f.write('data'+'\t'+'hora'+'\t'+'D32'+'\t'+'D33'+'\t'+'D34'+'\t'+'D35'+'\t'+'D36'+
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                                ### antiga escrita na saida com nomes genéricos ###
+                                """f.write('data'+'\t'+'hora'+'\t'+'D32'+'\t'+'D33'+'\t'+'D34'+'\t'+'D35'+'\t'+'D36'+
                                         '\t'+'D37'+'\t'+'D38'+'\t'+'D39'+'\t'+'T32'+'\t'+'T33'+'\t'+'T34'+'\t'+'T35'+
-                                        '\t'+'T36'+'\t'+'T37'+'\t'+'T38'+'\t'+'T39'+'\n')
+                                        '\t'+'T36'+'\t'+'T37'+'\t'+'T38'+'\t'+'T39'+'\n')"""
+                                ### nova escrita na saida ###
+                                f.write('data'+'\t'+'hora'+'\t'+var.disp_sensores[i-1][0]+'_D'+'\t'+var.disp_sensores[i-1][1]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][2]+'_D'+'\t'+var.disp_sensores[i-1][3]+'_D'+'\t'+var.disp_sensores[i-1][4]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][5]+'_D'+'\t'+var.disp_sensores[i-1][6]+'_D''\t'+var.disp_sensores[i-1][7]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][0]+'_T'+'\t'+var.disp_sensores[i-1][1]+'_T'+'\t'+var.disp_sensores[i-1][2]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][3]+'_T'+'\t'+var.disp_sensores[i-1][4]+'_T'+'\t'+var.disp_sensores[i-1][5]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D1[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1138,8 +1290,8 @@ class RIA(QtGui.QMainWindow):
                     if i == 2:
                         len(var.D2[0])  #teste para ver se há mais de um elemento em D                
                         try:
-                            f = open('rack'+ str(i) + '_' + self.date + '.dat', 'r')
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                            f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D2[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1147,10 +1299,16 @@ class RIA(QtGui.QMainWindow):
                                     f.write(str(a)+'\t')
                                 f.write('\n')
                         except:
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
-                                f.write('data'+'\t'+'hora'+'\t'+'D40'+'\t'+'D41'+'\t'+'D42'+'\t'+'D43'+'\t'+'D44'+
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                                """f.write('data'+'\t'+'hora'+'\t'+'D40'+'\t'+'D41'+'\t'+'D42'+'\t'+'D43'+'\t'+'D44'+
                                         '\t'+'D45'+'\t'+'D46'+'\t'+'D47'+'\t'+'T40'+'\t'+'T41'+'\t'+'T42'+'\t'+'T43'+
-                                        '\t'+'T44'+'\t'+'T45'+'\t'+'T46'+'\t'+'T47'+'\n')
+                                        '\t'+'T44'+'\t'+'T45'+'\t'+'T46'+'\t'+'T47'+'\n')"""
+                                f.write('data'+'\t'+'hora'+'\t'+var.disp_sensores[i-1][0]+'_D'+'\t'+var.disp_sensores[i-1][1]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][2]+'_D'+'\t'+var.disp_sensores[i-1][3]+'_D'+'\t'+var.disp_sensores[i-1][4]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][5]+'_D'+'\t'+var.disp_sensores[i-1][6]+'_D''\t'+var.disp_sensores[i-1][7]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][0]+'_T'+'\t'+var.disp_sensores[i-1][1]+'_T'+'\t'+var.disp_sensores[i-1][2]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][3]+'_T'+'\t'+var.disp_sensores[i-1][4]+'_T'+'\t'+var.disp_sensores[i-1][5]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D2[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1162,19 +1320,25 @@ class RIA(QtGui.QMainWindow):
                     if i == 3:
                         len(var.D3[0])  #teste para ver se há mais de um elemento em D                   
                         try:
-                            f = open('rack'+ str(i) + '_' + self.date + '.dat', 'r')
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
-                                f.write(str(self.date1) + '\t' + str(self.time) + '\t')
+                            f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                                f.write(str(self.dateacquire1) + '\t' + str(self.time) + '\t')
                                 for a in var.D3[-1][1:]:
                                     f.write(str(a)+'\t')
                                 for a in var.T3[-1][1:]:
                                     f.write(str(a)+'\t')
                                 f.write('\n')
                         except:
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
-                                f.write('data'+'\t'+'hora'+'\t'+'D48'+'\t'+'D49'+'\t'+'D50'+'\t'+'D51'+'\t'+'D52'+
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                                """f.write('data'+'\t'+'hora'+'\t'+'D48'+'\t'+'D49'+'\t'+'D50'+'\t'+'D51'+'\t'+'D52'+
                                         '\t'+'D53'+'\t'+'D54'+'\t'+'D55'+'\t'+'T48'+'\t'+'T49'+'\t'+'T50'+'\t'+'T51'+
-                                        '\t'+'T52'+'\t'+'T53'+'\t'+'T54'+'\t'+'T55'+'\n')
+                                        '\t'+'T52'+'\t'+'T53'+'\t'+'T54'+'\t'+'T55'+'\n')"""
+                                f.write('data'+'\t'+'hora'+'\t'+var.disp_sensores[i-1][0]+'_D'+'\t'+var.disp_sensores[i-1][1]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][2]+'_D'+'\t'+var.disp_sensores[i-1][3]+'_D'+'\t'+var.disp_sensores[i-1][4]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][5]+'_D'+'\t'+var.disp_sensores[i-1][6]+'_D''\t'+var.disp_sensores[i-1][7]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][0]+'_T'+'\t'+var.disp_sensores[i-1][1]+'_T'+'\t'+var.disp_sensores[i-1][2]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][3]+'_T'+'\t'+var.disp_sensores[i-1][4]+'_T'+'\t'+var.disp_sensores[i-1][5]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D3[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1186,8 +1350,8 @@ class RIA(QtGui.QMainWindow):
                     if i == 4:
                         len(var.D4[0])  #teste para ver se há mais de um elemento em D                    
                         try:
-                            f = open('rack'+ str(i) + '_' + self.date + '.dat', 'r')
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                            f = open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'r')
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D4[-1][1:]:
                                     f.write(str(a)+'\t')
@@ -1195,17 +1359,23 @@ class RIA(QtGui.QMainWindow):
                                     f.write(str(a)+'\t')
                                 f.write('\n')
                         except:
-                            with open('rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
-                                f.write('data'+'\t'+'hora'+'\t'+'D56'+'\t'+'D57'+'\t'+'D58'+'\t'+'D59'+'\t'+'D60'+
+                            with open(self.dir+'rack'+ str(i) + '_' + self.date + '.dat', 'a') as f:
+                                """f.write('data'+'\t'+'hora'+'\t'+'D56'+'\t'+'D57'+'\t'+'D58'+'\t'+'D59'+'\t'+'D60'+
                                         '\t'+'D61'+'\t'+'D62'+'\t'+'D63'+'\t'+'T56'+'\t'+'T57'+'\t'+'T58'+'\t'+'T59'+
-                                        '\t'+'T60'+'\t'+'T61'+'\t'+'T62'+'\t'+'T63'+'\n')
+                                        '\t'+'T60'+'\t'+'T61'+'\t'+'T62'+'\t'+'T63'+'\n')"""
+                                f.write('data'+'\t'+'hora'+'\t'+var.disp_sensores[i-1][0]+'_D'+'\t'+var.disp_sensores[i-1][1]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][2]+'_D'+'\t'+var.disp_sensores[i-1][3]+'_D'+'\t'+var.disp_sensores[i-1][4]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][5]+'_D'+'\t'+var.disp_sensores[i-1][6]+'_D''\t'+var.disp_sensores[i-1][7]+'_D'+'\t'+
+                                        var.disp_sensores[i-1][0]+'_T'+'\t'+var.disp_sensores[i-1][1]+'_T'+'\t'+var.disp_sensores[i-1][2]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][3]+'_T'+'\t'+var.disp_sensores[i-1][4]+'_T'+'\t'+var.disp_sensores[i-1][5]+'_T'+'\t'+
+                                        var.disp_sensores[i-1][6]+'_T'+'\t'+var.disp_sensores[i-1][7]+'_T'+'\n')
                                 f.write(str(self.date1) + '\t' + str(self.time) + '\t')
                                 for a in var.D4[-1][1:]:
                                     f.write(str(a)+'\t')
                                 for a in var.T4[-1][1:]:
                                     f.write(str(a)+'\t')
                                 f.write('\n')
-                    print('Dados do rack %d salvos.' %i)
+                    #print('Dados do rack %d salvos.' %i)
                 except TypeError:
                     """não salva nada caso haja apenas um elemento em D"""                
                     pass
@@ -1308,18 +1478,20 @@ class RIA(QtGui.QMainWindow):
 
     #carrega parâmetros salvos em disco
     def load_param(self):
+        
         with open('parameters.dat', 'r') as f:
             lines = f.readlines()
-
-            var.t_aq = int(lines[0])
+            
+            var.t_aq = float(lines[0]) #ANTES ERA INT
             var.t_cmp = int(lines[2])
-
+#            plot.set_dataList()
+            
             """Carrega status do Rack 1"""
             if lines[3] == 'True\n':
                 var.rack1 = True
             else:
                 var.rack1 = False
-
+            print("dddd")
             """Carrega status do Rack 2"""
             if lines[4] == 'True\n':
                 var.rack2 = True
@@ -1363,7 +1535,7 @@ class RIA(QtGui.QMainWindow):
                 self.item = QtGui.QTableWidgetItem(str('%.3f' %var.Do[3][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0,(i+24), self.item)
-
+                
             """Carrega To"""
             a = lines[11].split('\t')[:-1]
             for i in range(8):
@@ -1490,7 +1662,26 @@ class RIA(QtGui.QMainWindow):
 
             """Carrega indice de porta de comunicação serial"""
             var.ria.ui.PortBox.setCurrentIndex(int(lines[25]))
-
+            
+            #NOVO{
+            """Carrega estado dos plots da aba 'Online'"""
+            var.ria.ui.checkPlot1_on.setChecked(0)
+            var.ria.ui.checkPlot2_on.setChecked(0)
+            var.ria.ui.checkPlot3_on.setChecked(0)
+            var.ria.ui.checkPlot4_on.setChecked(0)
+            var.ria.ui.checkPlot5_on.setChecked(0)
+            var.ria.ui.checkPlot6_on.setChecked(0)
+            var.ria.ui.checkPlot7_on.setChecked(0)
+            var.ria.ui.checkPlot8_on.setChecked(0)
+            var.ria.ui.checkPlot9_on.setChecked(0)
+            var.ria.ui.checkPlot10_on.setChecked(0)
+            var.ria.ui.checkPlot11_on.setChecked(0)
+            var.ria.ui.checkPlot12_on.setChecked(0)
+            var.ria.ui.checkPlot13_on.setChecked(0)
+            var.ria.ui.checkPlot14_on.setChecked(0)
+            var.ria.ui.checkPlot15_on.setChecked(0)
+            var.ria.ui.checkPlot16_on.setChecked(0)
+            #}
         print("Parâmetros carregados")
 
     #define valor atual das medidas de nivel e temperatura como referência
@@ -1908,6 +2099,8 @@ class Plot(threading.Thread):
         while var.graphFlag:
             pass                    
                 
-                
+               
 if __name__ == "__main__":
     telas = Screen()
+
+#from python_pyqt_NewVersion_v5 import plot
