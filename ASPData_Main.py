@@ -3,8 +3,8 @@ import time
 import sys
 import threading
 import numpy as np
-from Variables import var  # novo
-from UI_definitions import Ui_MainWindow   # novo
+from Variables import var
+from UI_definitions import Ui_MainWindow
 from PyQt4 import QtCore, QtGui
 from serial.tools import list_ports
 from functools import partial
@@ -36,12 +36,6 @@ class RIA(QtGui.QMainWindow):
         var.ria.ui.cmp.setValue(var.cmp)
         var.ria.ui.t_aq.setValue(var.t_aq)
 
-        # seta flags de habilitação dos racks em var
-#        var.rack1 = var.ria.ui.check1.isChecked()
-#        var.rack2 = var.ria.ui.check2.isChecked()
-#        var.rack3 = var.ria.ui.check3.isChecked()
-#        var.rack4 = var.ria.ui.check4.isChecked()
-
         # reduz comprimento das celulas das tabelas
         var.ria.ui.tableWidget.resizeColumnsToContents()
         var.ria.ui.tableWidget_2.resizeColumnsToContents()
@@ -59,21 +53,21 @@ class RIA(QtGui.QMainWindow):
 
         # adiciona plots caso estejam habilitados
         if var.ria.ui.checkPlot1.isChecked():
-            self.set_plot1()
+            self.set_plot(0)
         if var.ria.ui.checkPlot2.isChecked():
-            self.set_plot2()
+            self.set_plot(1)
         if var.ria.ui.checkPlot3.isChecked():
-            self.set_plot3()
+            self.set_plot(2)
         if var.ria.ui.checkPlot4.isChecked():
-            self.set_plot4()
+            self.set_plot(3)
         if var.ria.ui.checkPlot5.isChecked():
-            self.set_plot5()
+            self.set_plot(4)
         if var.ria.ui.checkPlot6.isChecked():
-            self.set_plot6()
+            self.set_plot(5)
         if var.ria.ui.checkPlot7.isChecked():
-            self.set_plot7()
+            self.set_plot(6)
         if var.ria.ui.checkPlot8.isChecked():
-            self.set_plot8()
+            self.set_plot(7)
 
         # conecta sinais às respectivas funções
         var.ria.ui.ResButton.clicked[bool].connect(self.res)
@@ -87,22 +81,22 @@ class RIA(QtGui.QMainWindow):
         var.ria.ui.check2.clicked[bool].connect(self.enable_racks1)
         var.ria.ui.check3.clicked[bool].connect(self.enable_racks1)
         var.ria.ui.check4.clicked[bool].connect(self.enable_racks1)
-        var.ria.ui.checkPlot1.stateChanged.connect(self.set_plot1)
-        var.ria.ui.checkPlot2.stateChanged.connect(self.set_plot2)
-        var.ria.ui.checkPlot3.stateChanged.connect(self.set_plot3)
-        var.ria.ui.checkPlot4.stateChanged.connect(self.set_plot4)
-        var.ria.ui.checkPlot5.stateChanged.connect(self.set_plot5)
-        var.ria.ui.checkPlot6.stateChanged.connect(self.set_plot6)
-        var.ria.ui.checkPlot7.stateChanged.connect(self.set_plot7)
-        var.ria.ui.checkPlot8.stateChanged.connect(self.set_plot8)
-        var.ria.ui.PlotBox1.currentIndexChanged.connect(self.set_plot1)
-        var.ria.ui.PlotBox2.currentIndexChanged.connect(self.set_plot2)
-        var.ria.ui.PlotBox3.currentIndexChanged.connect(self.set_plot3)
-        var.ria.ui.PlotBox4.currentIndexChanged.connect(self.set_plot4)
-        var.ria.ui.PlotBox5.currentIndexChanged.connect(self.set_plot5)
-        var.ria.ui.PlotBox6.currentIndexChanged.connect(self.set_plot6)
-        var.ria.ui.PlotBox7.currentIndexChanged.connect(self.set_plot7)
-        var.ria.ui.PlotBox8.currentIndexChanged.connect(self.set_plot8)
+        var.ria.ui.checkPlot1.stateChanged.connect(partial(self.set_plot, k=0))
+        var.ria.ui.checkPlot2.stateChanged.connect(partial(self.set_plot, k=1))
+        var.ria.ui.checkPlot3.stateChanged.connect(partial(self.set_plot, k=2))
+        var.ria.ui.checkPlot4.stateChanged.connect(partial(self.set_plot, k=3))
+        var.ria.ui.checkPlot5.stateChanged.connect(partial(self.set_plot, k=4))
+        var.ria.ui.checkPlot6.stateChanged.connect(partial(self.set_plot, k=5))
+        var.ria.ui.checkPlot7.stateChanged.connect(partial(self.set_plot, k=6))
+        var.ria.ui.checkPlot8.stateChanged.connect(partial(self.set_plot, k=7))
+        var.ria.ui.PlotBox1.currentIndexChanged.connect(partial(self.set_plot, k=0))
+        var.ria.ui.PlotBox2.currentIndexChanged.connect(partial(self.set_plot, k=1))
+        var.ria.ui.PlotBox3.currentIndexChanged.connect(partial(self.set_plot, k=2))
+        var.ria.ui.PlotBox4.currentIndexChanged.connect(partial(self.set_plot, k=3))
+        var.ria.ui.PlotBox5.currentIndexChanged.connect(partial(self.set_plot, k=4))
+        var.ria.ui.PlotBox6.currentIndexChanged.connect(partial(self.set_plot, k=5))
+        var.ria.ui.PlotBox7.currentIndexChanged.connect(partial(self.set_plot, k=6))
+        var.ria.ui.PlotBox8.currentIndexChanged.connect(partial(self.set_plot, k=7))
         var.ria.ui.t_aq.valueChanged.connect(self.set_t_aq)
         var.ria.ui.cmp.valueChanged.connect(self.set_cmp)
 
@@ -127,7 +121,7 @@ class RIA(QtGui.QMainWindow):
                 var.ria.ui.plotBoxSens_on.addItems(var.disp_sensores[3])
 
         # Adiciona plots [online]
-        for j in range (16):
+        for j in range(16):
             plot.set_plot_on(j)
 
         # conecta sinais às respectivas funções [online e offline]
@@ -252,477 +246,72 @@ class RIA(QtGui.QMainWindow):
             var.rack4 = False
 
     """ inicializa Plot1 """
-    def set_plot1(self):
-        if not var.ria.ui.checkPlot1.isChecked():
+    def set_plot(self, k):
+        self.checkPlot_list = [var.ria.ui.checkPlot1, var.ria.ui.checkPlot2,
+                                var.ria.ui.checkPlot3, var.ria.ui.checkPlot4,
+                                var.ria.ui.checkPlot5, var.ria.ui.checkPlot6,
+                                var.ria.ui.checkPlot7, var.ria.ui.checkPlot8]
+        self.PlotBox_list = [var.ria.ui.PlotBox1, var.ria.ui.PlotBox2,
+                                var.ria.ui.PlotBox3, var.ria.ui.PlotBox4,
+                                var.ria.ui.PlotBox5, var.ria.ui.PlotBox6,
+                                var.ria.ui.PlotBox7, var.ria.ui.PlotBox8]
+        if not self.checkPlot_list[k].isChecked():
             # apaga plot e nome caso esteja desabilitado
-            var.ria.ui.widget.Plots[0].setTitle("")
-            var.ria.ui.widget.Plots[1].setTitle("")
-            var.ria.ui.widget.Data[0] = dataclass()
-            var.ria.ui.widget.Data[1] = dataclass()
+            var.ria.ui.widget.Plots[k].setTitle("")
+            var.ria.ui.widget.Plots[k+1].setTitle("")
+            var.ria.ui.widget.Data[k] = dataclass()
+            var.ria.ui.widget.Data[k+1] = dataclass()
         else:
             # muda nome do plot e zera valores
-            var.ria.ui.widget.Plots[0].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox1.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[1].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox1.currentIndex()]+" T")
-            var.ria.ui.widget.Data[0] = dataclass()
-            var.ria.ui.widget.Data[1] = dataclass()
+            var.ria.ui.widget.Plots[k].setTitle(
+                var.sensor_list[self.PlotBox_list[k].currentIndex()]+" D")
+            var.ria.ui.widget.Plots[k+1].setTitle(
+                var.sensor_list[self.PlotBox_list[k].currentIndex()]+" T")
+            var.ria.ui.widget.Data[k] = dataclass()
+            var.ria.ui.widget.Data[k+1] = dataclass()
 
             # plot dados disponíveis
-            self.index = divmod(var.ria.ui.PlotBox1.currentIndex(), 8)
+            self.index = divmod(self.PlotBox_list[k].currentIndex(), 8)
             if self.index[0] == 0:
                 if len(var.D1) > 2:
                     for i in var.D1:
-                        var.ria.ui.widget.Data[0].x = np.append(var.ria.ui.widget.Data[0].x, i[0])
-                        var.ria.ui.widget.Data[0].y = np.append(
-                            var.ria.ui.widget.Data[0].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k].x = np.append(var.ria.ui.widget.Data[k].x, i[0])
+                        var.ria.ui.widget.Data[k].y = np.append(
+                            var.ria.ui.widget.Data[k].y, i[self.index[1]+1])
                     for i in var.T1:
-                        var.ria.ui.widget.Data[1].x = np.append(var.ria.ui.widget.Data[1].x, i[0])
-                        var.ria.ui.widget.Data[1].y = np.append(
-                            var.ria.ui.widget.Data[1].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k+1].x = np.append(var.ria.ui.widget.Data[k+1].x, i[0])
+                        var.ria.ui.widget.Data[k+1].y = np.append(
+                            var.ria.ui.widget.Data[k+1].y, i[self.index[1]+1])
             if self.index[0] == 1:
                 if len(var.D2) > 2:
                     for i in var.D2:
-                        var.ria.ui.widget.Data[0].x = np.append(var.ria.ui.widget.Data[0].x, i[0])
-                        var.ria.ui.widget.Data[0].y = np.append(
-                            var.ria.ui.widget.Data[0].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k].x = np.append(var.ria.ui.widget.Data[k].x, i[0])
+                        var.ria.ui.widget.Data[k].y = np.append(
+                            var.ria.ui.widget.Data[k].y, i[self.index[1]+1])
                     for i in var.T2:
-                        var.ria.ui.widget.Data[1].x = np.append(var.ria.ui.widget.Data[1].x, i[0])
-                        var.ria.ui.widget.Data[1].y = np.append(
-                            var.ria.ui.widget.Data[1].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k+1].x = np.append(var.ria.ui.widget.Data[k+1].x, i[0])
+                        var.ria.ui.widget.Data[k+1].y = np.append(
+                            var.ria.ui.widget.Data[k+1].y, i[self.index[1]+1])
             if self.index[0] == 2:
                 if len(var.D3) > 2:
                     for i in var.D3:
-                        var.ria.ui.widget.Data[0].x = np.append(var.ria.ui.widget.Data[0].x, i[0])
-                        var.ria.ui.widget.Data[0].y = np.append(
-                            var.ria.ui.widget.Data[0].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k].x = np.append(var.ria.ui.widget.Data[k].x, i[0])
+                        var.ria.ui.widget.Data[k].y = np.append(
+                            var.ria.ui.widget.Data[k].y, i[self.index[1]+1])
                     for i in var.T3:
-                        var.ria.ui.widget.Data[1].x = np.append(var.ria.ui.widget.Data[1].x, i[0])
-                        var.ria.ui.widget.Data[1].y = np.append(
-                            var.ria.ui.widget.Data[1].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k+1].x = np.append(var.ria.ui.widget.Data[k+1].x, i[0])
+                        var.ria.ui.widget.Data[k+1].y = np.append(
+                            var.ria.ui.widget.Data[k+1].y, i[self.index[1]+1])
             if self.index[0] == 3:
                 if len(var.D4) > 2:
                     for i in var.D4:
-                        var.ria.ui.widget.Data[0].x = np.append(var.ria.ui.widget.Data[0].x, i[0])
-                        var.ria.ui.widget.Data[0].y = np.append(
-                            var.ria.ui.widget.Data[0].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k].x = np.append(var.ria.ui.widget.Data[k].x, i[0])
+                        var.ria.ui.widget.Data[k].y = np.append(
+                            var.ria.ui.widget.Data[k].y, i[self.index[1]+1])
                     for i in var.T4:
-                        var.ria.ui.widget.Data[1].x = np.append(var.ria.ui.widget.Data[1].x, i[0])
-                        var.ria.ui.widget.Data[1].y = np.append(
-                            var.ria.ui.widget.Data[1].y, i[self.index[1]+1])
-
-    # inicializa Plot2
-    def set_plot2(self):
-        if not var.ria.ui.checkPlot2.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[2].setTitle("")
-            var.ria.ui.widget.Plots[3].setTitle("")
-            var.ria.ui.widget.Data[2] = dataclass()
-            var.ria.ui.widget.Data[3] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[2].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox2.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[3].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox2.currentIndex()]+" T")
-            var.ria.ui.widget.Data[2] = dataclass()
-            var.ria.ui.widget.Data[3] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox2.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[2].x = np.append(var.ria.ui.widget.Data[2].x, i[0])
-                        var.ria.ui.widget.Data[2].y = np.append(
-                            var.ria.ui.widget.Data[2].y, i[(self.index[1]+1)])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[3].x = np.append(var.ria.ui.widget.Data[3].x, i[0])
-                        var.ria.ui.widget.Data[3].y = np.append(
-                            var.ria.ui.widget.Data[3].y, i[(self.index[1]+1)])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[2].x = np.append(var.ria.ui.widget.Data[2].x, i[0])
-                        var.ria.ui.widget.Data[2].y = np.append(
-                            var.ria.ui.widget.Data[2].y, i[(self.index[1]+1)])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[3].x = np.append(var.ria.ui.widget.Data[3].x, i[0])
-                        var.ria.ui.widget.Data[3].y = np.append(
-                            var.ria.ui.widget.Data[3].y, i[(self.index[1]+1)])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[2].x = np.append(var.ria.ui.widget.Data[2].x, i[0])
-                        var.ria.ui.widget.Data[2].y = np.append(
-                            var.ria.ui.widget.Data[2].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[3].x = np.append(var.ria.ui.widget.Data[3].x, i[0])
-                        var.ria.ui.widget.Data[3].y = np.append(
-                            var.ria.ui.widget.Data[3].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[2].x = np.append(var.ria.ui.widget.Data[2].x, i[0])
-                        var.ria.ui.widget.Data[2].y = np.append(
-                            var.ria.ui.widget.Data[2].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[3].x = np.append(var.ria.ui.widget.Data[3].x, i[0])
-                        var.ria.ui.widget.Data[3].y = np.append(
-                            var.ria.ui.widget.Data[3].y, i[self.index[1]+1])
-
-    # inicializa Plot3
-    def set_plot3(self):
-        if not var.ria.ui.checkPlot3.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[4].setTitle("")
-            var.ria.ui.widget.Plots[5].setTitle("")
-            var.ria.ui.widget.Data[4] = dataclass()
-            var.ria.ui.widget.Data[5] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[4].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox3.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[5].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox3.currentIndex()]+" T")
-            var.ria.ui.widget.Data[4] = dataclass()
-            var.ria.ui.widget.Data[5] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox3.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[4].x = np.append(var.ria.ui.widget.Data[4].x, i[0])
-                        var.ria.ui.widget.Data[4].y = np.append(
-                            var.ria.ui.widget.Data[4].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[5].x = np.append(var.ria.ui.widget.Data[5].x, i[0])
-                        var.ria.ui.widget.Data[5].y = np.append(
-                            var.ria.ui.widget.Data[5].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[4].x = np.append(var.ria.ui.widget.Data[4].x, i[0])
-                        var.ria.ui.widget.Data[4].y = np.append(
-                            var.ria.ui.widget.Data[4].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[5].x = np.append(var.ria.ui.widget.Data[5].x, i[0])
-                        var.ria.ui.widget.Data[5].y = np.append(
-                            var.ria.ui.widget.Data[5].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[4].x = np.append(var.ria.ui.widget.Data[4].x, i[0])
-                        var.ria.ui.widget.Data[4].y = np.append(
-                            var.ria.ui.widget.Data[4].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[5].x = np.append(var.ria.ui.widget.Data[5].x, i[0])
-                        var.ria.ui.widget.Data[5].y = np.append(
-                            var.ria.ui.widget.Data[5].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[4].x = np.append(var.ria.ui.widget.Data[4].x, i[0])
-                        var.ria.ui.widget.Data[4].y = np.append(
-                            var.ria.ui.widget.Data[4].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[5].x = np.append(var.ria.ui.widget.Data[5].x, i[0])
-                        var.ria.ui.widget.Data[5].y = np.append(
-                            var.ria.ui.widget.Data[5].y, i[self.index[1]+1])
-
-    # inicializa Plot4
-    def set_plot4(self):
-        if not var.ria.ui.checkPlot4.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[6].setTitle("")
-            var.ria.ui.widget.Plots[7].setTitle("")
-            var.ria.ui.widget.Data[6] = dataclass()
-            var.ria.ui.widget.Data[7] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[6].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox4.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[7].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox4.currentIndex()]+" T")
-            var.ria.ui.widget.Data[6] = dataclass()
-            var.ria.ui.widget.Data[7] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox4.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[6].x = np.append(var.ria.ui.widget.Data[6].x, i[0])
-                        var.ria.ui.widget.Data[6].y = np.append(
-                            var.ria.ui.widget.Data[6].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[7].x = np.append(var.ria.ui.widget.Data[7].x, i[0])
-                        var.ria.ui.widget.Data[7].y = np.append(
-                            var.ria.ui.widget.Data[7].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[6].x = np.append(var.ria.ui.widget.Data[6].x, i[0])
-                        var.ria.ui.widget.Data[6].y = np.append(
-                            var.ria.ui.widget.Data[6].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[7].x = np.append(var.ria.ui.widget.Data[7].x, i[0])
-                        var.ria.ui.widget.Data[7].y = np.append(
-                            var.ria.ui.widget.Data[7].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[6].x = np.append(var.ria.ui.widget.Data[6].x, i[0])
-                        var.ria.ui.widget.Data[6].y = np.append(
-                            var.ria.ui.widget.Data[6].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[7].x = np.append(var.ria.ui.widget.Data[7].x, i[0])
-                        var.ria.ui.widget.Data[7].y = np.append(
-                            var.ria.ui.widget.Data[7].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[6].x = np.append(var.ria.ui.widget.Data[6].x, i[0])
-                        var.ria.ui.widget.Data[6].y = np.append(
-                            var.ria.ui.widget.Data[6].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[7].x = np.append(var.ria.ui.widget.Data[7].x, i[0])
-                        var.ria.ui.widget.Data[7].y = np.append(
-                            var.ria.ui.widget.Data[7].y, i[self.index[1]+1])
-
-    # inicializa Plot5
-    def set_plot5(self):
-        if not var.ria.ui.checkPlot5.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[8].setTitle("")
-            var.ria.ui.widget.Plots[9].setTitle("")
-            var.ria.ui.widget.Data[8] = dataclass()
-            var.ria.ui.widget.Data[9] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[8].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox5.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[9].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox5.currentIndex()]+" T")
-            var.ria.ui.widget.Data[8] = dataclass()
-            var.ria.ui.widget.Data[9] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox5.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[8].x = np.append(var.ria.ui.widget.Data[8].x, i[0])
-                        var.ria.ui.widget.Data[8].y = np.append(
-                            var.ria.ui.widget.Data[8].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[9].x = np.append(var.ria.ui.widget.Data[9].x, i[0])
-                        var.ria.ui.widget.Data[9].y = np.append(
-                            var.ria.ui.widget.Data[9].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[8].x = np.append(var.ria.ui.widget.Data[8].x, i[0])
-                        var.ria.ui.widget.Data[8].y = np.append(
-                            var.ria.ui.widget.Data[8].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[9].x = np.append(var.ria.ui.widget.Data[9].x, i[0])
-                        var.ria.ui.widget.Data[9].y = np.append(
-                            var.ria.ui.widget.Data[9].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[8].x = np.append(var.ria.ui.widget.Data[8].x, i[0])
-                        var.ria.ui.widget.Data[8].y = np.append(
-                            var.ria.ui.widget.Data[8].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[9].x = np.append(var.ria.ui.widget.Data[9].x, i[0])
-                        var.ria.ui.widget.Data[9].y = np.append(
-                            var.ria.ui.widget.Data[9].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[8].x = np.append(var.ria.ui.widget.Data[8].x, i[0])
-                        var.ria.ui.widget.Data[8].y = np.append(
-                            var.ria.ui.widget.Data[8].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[9].x = np.append(var.ria.ui.widget.Data[9].x, i[0])
-                        var.ria.ui.widget.Data[9].y = np.append(
-                            var.ria.ui.widget.Data[9].y, i[self.index[1]+1])
-
-    # inicializa Plot6
-    def set_plot6(self):
-        if not var.ria.ui.checkPlot6.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[10].setTitle("")
-            var.ria.ui.widget.Plots[11].setTitle("")
-            var.ria.ui.widget.Data[10] = dataclass()
-            var.ria.ui.widget.Data[11] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[10].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox6.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[11].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox6.currentIndex()]+" T")
-            var.ria.ui.widget.Data[10] = dataclass()
-            var.ria.ui.widget.Data[11] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox6.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[10].x = np.append(var.ria.ui.widget.Data[10].x, i[0])
-                        var.ria.ui.widget.Data[10].y = np.append(
-                            var.ria.ui.widget.Data[10].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[11].x = np.append(var.ria.ui.widget.Data[11].x, i[0])
-                        var.ria.ui.widget.Data[11].y = np.append(
-                            var.ria.ui.widget.Data[11].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[10].x = np.append(var.ria.ui.widget.Data[10].x, i[0])
-                        var.ria.ui.widget.Data[10].y = np.append(
-                            var.ria.ui.widget.Data[10].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[11].x = np.append(var.ria.ui.widget.Data[11].x, i[0])
-                        var.ria.ui.widget.Data[11].y = np.append(
-                            var.ria.ui.widget.Data[11].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[10].x = np.append(var.ria.ui.widget.Data[10].x, i[0])
-                        var.ria.ui.widget.Data[10].y = np.append(
-                            var.ria.ui.widget.Data[10].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[11].x = np.append(var.ria.ui.widget.Data[11].x, i[0])
-                        var.ria.ui.widget.Data[11].y = np.append(
-                            var.ria.ui.widget.Data[11].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[10].x = np.append(var.ria.ui.widget.Data[10].x, i[0])
-                        var.ria.ui.widget.Data[10].y = np.append(
-                            var.ria.ui.widget.Data[10].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[11].x = np.append(var.ria.ui.widget.Data[11].x, i[0])
-                        var.ria.ui.widget.Data[11].y = np.append(
-                            var.ria.ui.widget.Data[11].y, i[self.index[1]+1])
-
-    # inicializa Plot7
-    def set_plot7(self):
-        if not var.ria.ui.checkPlot7.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[12].setTitle("")
-            var.ria.ui.widget.Plots[13].setTitle("")
-            var.ria.ui.widget.Data[12] = dataclass()
-            var.ria.ui.widget.Data[13] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[12].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox7.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[13].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox7.currentIndex()]+" T")
-            var.ria.ui.widget.Data[12] = dataclass()
-            var.ria.ui.widget.Data[13] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox7.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[12].x = np.append(var.ria.ui.widget.Data[12].x, i[0])
-                        var.ria.ui.widget.Data[12].y = np.append(
-                            var.ria.ui.widget.Data[12].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[13].x = np.append(var.ria.ui.widget.Data[13].x, i[0])
-                        var.ria.ui.widget.Data[13].y = np.append(
-                            var.ria.ui.widget.Data[13].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[12].x = np.append(var.ria.ui.widget.Data[12].x, i[0])
-                        var.ria.ui.widget.Data[12].y = np.append(
-                            var.ria.ui.widget.Data[12].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[13].x = np.append(var.ria.ui.widget.Data[13].x, i[0])
-                        var.ria.ui.widget.Data[13].y = np.append(
-                            var.ria.ui.widget.Data[13].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[12].x = np.append(var.ria.ui.widget.Data[12].x, i[0])
-                        var.ria.ui.widget.Data[12].y = np.append(
-                            var.ria.ui.widget.Data[12].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[13].x = np.append(var.ria.ui.widget.Data[13].x, i[0])
-                        var.ria.ui.widget.Data[13].y = np.append(
-                            var.ria.ui.widget.Data[13].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[12].x = np.append(var.ria.ui.widget.Data[12].x, i[0])
-                        var.ria.ui.widget.Data[12].y = np.append(
-                            var.ria.ui.widget.Data[12].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[13].x = np.append(var.ria.ui.widget.Data[13].x, i[0])
-                        var.ria.ui.widget.Data[13].y = np.append(
-                            var.ria.ui.widget.Data[13].y, i[self.index[1]+1])
-
-    # inicializa Plot8
-    def set_plot8(self):
-        if not var.ria.ui.checkPlot8.isChecked():
-            """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget.Plots[14].setTitle("")
-            var.ria.ui.widget.Plots[15].setTitle("")
-            var.ria.ui.widget.Data[14] = dataclass()
-            var.ria.ui.widget.Data[15] = dataclass()
-        else:
-            """muda nome do plot"""
-            var.ria.ui.widget.Plots[14].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox8.currentIndex()]+" D")
-            var.ria.ui.widget.Plots[15].setTitle(
-                var.sensor_list[var.ria.ui.PlotBox8.currentIndex()]+" T")
-            var.ria.ui.widget.Data[14] = dataclass()
-            var.ria.ui.widget.Data[15] = dataclass()
-            """plot dados disponíveis"""
-            self.index = divmod(var.ria.ui.PlotBox8.currentIndex(), 8)
-            if self.index[0] == 0:
-                if len(var.D1) > 2:
-                    for i in var.D1:
-                        var.ria.ui.widget.Data[14].x = np.append(var.ria.ui.widget.Data[14].x, i[0])
-                        var.ria.ui.widget.Data[14].y = np.append(
-                            var.ria.ui.widget.Data[14].y, i[self.index[1]+1])
-                    for i in var.T1:
-                        var.ria.ui.widget.Data[15].x = np.append(var.ria.ui.widget.Data[15].x, i[0])
-                        var.ria.ui.widget.Data[15].y = np.append(
-                            var.ria.ui.widget.Data[15].y, i[self.index[1]+1])
-            if self.index[0] == 1:
-                if len(var.D2) > 2:
-                    for i in var.D2:
-                        var.ria.ui.widget.Data[14].x = np.append(var.ria.ui.widget.Data[14].x, i[0])
-                        var.ria.ui.widget.Data[14].y = np.append(
-                            var.ria.ui.widget.Data[14].y, i[self.index[1]+1])
-                    for i in var.T2:
-                        var.ria.ui.widget.Data[15].x = np.append(var.ria.ui.widget.Data[15].x, i[0])
-                        var.ria.ui.widget.Data[15].y = np.append(
-                            var.ria.ui.widget.Data[15].y, i[self.index[1]+1])
-            if self.index[0] == 2:
-                if len(var.D3) > 2:
-                    for i in var.D3:
-                        var.ria.ui.widget.Data[14].x = np.append(var.ria.ui.widget.Data[14].x, i[0])
-                        var.ria.ui.widget.Data[14].y = np.append(
-                            var.ria.ui.widget.Data[14].y, i[self.index[1]+1])
-                    for i in var.T3:
-                        var.ria.ui.widget.Data[15].x = np.append(var.ria.ui.widget.Data[15].x, i[0])
-                        var.ria.ui.widget.Data[15].y = np.append(
-                            var.ria.ui.widget.Data[15].y, i[self.index[1]+1])
-            if self.index[0] == 3:
-                if len(var.D4) > 2:
-                    for i in var.D4:
-                        var.ria.ui.widget.Data[14].x = np.append(var.ria.ui.widget.Data[14].x, i[0])
-                        var.ria.ui.widget.Data[14].y = np.append(
-                            var.ria.ui.widget.Data[14].y, i[self.index[1]+1])
-                    for i in var.T4:
-                        var.ria.ui.widget.Data[15].x = np.append(var.ria.ui.widget.Data[15].x, i[0])
-                        var.ria.ui.widget.Data[15].y = np.append(
-                            var.ria.ui.widget.Data[15].y, i[self.index[1]+1])
+                        var.ria.ui.widget.Data[k+1].x = np.append(var.ria.ui.widget.Data[k+1].x, i[0])
+                        var.ria.ui.widget.Data[k+1].y = np.append(
+                            var.ria.ui.widget.Data[k+1].y, i[self.index[1]+1])
 
     # atualiza tabela com os valores recebidos
 
