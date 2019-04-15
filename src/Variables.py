@@ -5,6 +5,9 @@ class Var(object):
     def __init__(self):
         ####Inicio da Declaração de variáveis globais####
 
+        """Variável com informação do rack sendo lido """
+        self.i = 0
+
         """Variável para alocar a interface gráfica"""
         self.ria = None
 
@@ -216,6 +219,7 @@ class Var(object):
         self.Cm = self.Hdiff*self.Cdil_vessel*1e-6*(self.T-self.Tref)
 
         ## variveis para plot ##
+        self.refSet = False
         self.refD1 = [0, 0, 0, 0, 0, 0, 0, 0]
         self.refT1 = [0,0,0,0,0,0,0,0]
         self.refD2 = [0,0,0,0,0,0,0,0]

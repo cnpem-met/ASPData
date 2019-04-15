@@ -1,36 +1,47 @@
-import serial
+# USANDO PYQT4
+
 import time
 import sys, os
 import threading
+import serial
 import numpy as np
 from Variables import var
 from UI_definitions import Ui_MainWindow
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QObject, pyqtSignal
 from serial.tools import list_ports
 from functools import partial
 from Plot_definitions import dataclass
 from Plot_functions import plot
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
 """ setting the root directory to the scripts folder """
 os.chdir('..\..\src')
 
-class RIA(QtGui.QMainWindow):
+# try:
+#     _fromUtf8 = QtCore.QString.fromUtf8
+# except AttributeError:
+#     def _fromUtf8(s):
+#         return s
+
+class RIA(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("Fogale HLS")
 
     """ início das funções relacionadas à interface """
     def ui_init(self):
-        plot.set_dataList()
+
+        self.thread_plot = PlotThread(self)
+        self.thread_plot_on = PlotThread(self)
+
+        self.thread_plot.signal.connect(var.ria.call_plot)
+        self.thread_plot_on.signal.connect(plot.plot_call)
+        #self.thread_plot.PLOT.connect(self.plot)
+        #QtCore.QObject.disconnect(self.thread_plot, QtCore.SIGNAL('PLOT'), self.plot)
+        #plot.set_dataList()
         self.list_ports()
         self.load_param()
 
@@ -132,7 +143,8 @@ class RIA(QtGui.QMainWindow):
         var.ria.ui.btn1.clicked[bool].connect(plot.getDate_ini)
         var.ria.ui.btn2.clicked[bool].connect(plot.getDate_fim)
         var.ria.ui.btn_play.clicked[bool].connect(plot.startPlot_off)
-        var.ria.ui.btn_stop2.clicked[bool].connect(plot.stopPlot)
+        var.ria.ui.startPlotBtn_on.clicked[bool].connect(plot.startPlot_on)
+        var.ria.ui.stopPlotBtn_on.clicked[bool].connect(plot.stopPlot_on)
         var.ria.ui.setScaleBtn.clicked[bool].connect(plot.setScalePlot)
         var.ria.ui.setAutoScaleBtn.clicked[bool].connect(plot.setAutoScalePlot)
         var.ria.ui.plotAbsBtn_off.clicked[bool].connect(plot.startPlot_abs_off)
@@ -140,11 +152,11 @@ class RIA(QtGui.QMainWindow):
         var.ria.ui.plotRefFixaBtn_off.clicked[bool].connect(plot.startPlot_refFixa_off)
         var.ria.ui.plotRefMedGBtn_off.clicked[bool].connect(plot.startPlot_refMediaG_off)
         var.ria.ui.setRefBtn_off.clicked[bool].connect(plot.setRef_off)
-        var.ria.ui.plotAbsBtn.clicked[bool].connect(plot.startPlot_abs)
-        var.ria.ui.plotRefSensorBtn.clicked[bool].connect(plot.startPlot_refSensor)
-        var.ria.ui.plotRefMedGBtn.clicked[bool].connect(plot.startPlot_refMediaG)
-        var.ria.ui.plotRefMedIBtn.clicked[bool].connect(plot.startPlot_refMediaI)
-        var.ria.ui.plotRefFixBtn.clicked[bool].connect(plot.startPlot_refFixa)
+        # var.ria.ui.plotAbsBtn.clicked[bool].connect(plot.startPlot_abs)
+        # var.ria.ui.plotRefSensorBtn.clicked[bool].connect(plot.startPlot_refSensor)
+        # var.ria.ui.plotRefMedGBtn.clicked[bool].connect(plot.startPlot_refMediaG)
+        # var.ria.ui.plotRefMedIBtn.clicked[bool].connect(plot.startPlot_refMediaI)
+        # var.ria.ui.plotRefFixBtn.clicked[bool].connect(plot.startPlot_refFixa)
         var.ria.ui.checkPlot1_on.stateChanged.connect(partial(plot.set_plot_on, j=0))
         var.ria.ui.checkPlot2_on.stateChanged.connect(partial(plot.set_plot_on, j=1))
         var.ria.ui.checkPlot3_on.stateChanged.connect(partial(plot.set_plot_on, j=2))
@@ -164,7 +176,6 @@ class RIA(QtGui.QMainWindow):
         var.ria.ui.plotBox_on.currentIndexChanged.connect(plot.plotBox_act)
         var.ria.ui.cmp_on.valueChanged.connect(plot.set_cmp_on)
         var.ria.ui.setRef_onBtn.clicked.connect(plot.setRef_on)
-        #var.ria.ui.checkCmp_on.stateChanged.connect(plot.set_checkCmp_on)
         var.ria.ui.plotBox_data.currentIndexChanged.connect(plot.plotBox_dataAct)
 
 
@@ -194,10 +205,10 @@ class RIA(QtGui.QMainWindow):
             var.serialFlag = True
             self.Com = Communication()
         except:
-            raise
-            QtGui.QMessageBox.information(self, "Serial error",
+            # raise
+            QtWidgets.QMessageBox.information(self, "Serial error",
                                           "Couldn't open communication. Please check if it's already open.")
-
+            pass
     """ fecha comunicação serial """
     def close_com(self):
         try:
@@ -206,7 +217,8 @@ class RIA(QtGui.QMainWindow):
                 var.serialFlag = False
                 print("Serial port is closed")
         except:
-            raise
+            pass
+            #raise
 
     """ habilita racks """
     def enable_racks1(self):
@@ -325,30 +337,38 @@ class RIA(QtGui.QMainWindow):
                 """atualiza tabela na interface"""
                 for j in range(8):
                     """atualiza valores em D"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.D1[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.D1[-1][(j+1)]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0, j, self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.D1[-1][(j+1)] - var.Do[0][j])))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(1, j, self.item)
                     """atualiza valores em Davg"""
                     var.Davg[0][j] = var.wlast*var.Davg[0][j] + var.wcurr*var.D1[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[0][j]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(2, j, self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[0][j]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(0, j, self.item)
                     """atualiza valores em T"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.T1[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.T1[-1][(j+1)]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3, j, self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.T1[-1][(j+1)] - var.To[0][j])))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4, j, self.item)
                     """atualiza valores em Tavg"""
                     var.Tavg[0][j] = var.wlast*var.Tavg[0][j] + var.wcurr*var.T1[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[0][j]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(5, j, self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[0][j]))
+                    self.item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(1, j, self.item)
             except IndexError:
                 "não atualiza caso haja apenas um conjunto de dados em D1"""
@@ -365,40 +385,40 @@ class RIA(QtGui.QMainWindow):
                 """atualiza tabela na interface"""
                 for j in range(8):
                     """atualiza valores em D"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.D2[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.D2[-1][(j+1)]))
                     var.ria.ui.tableWidget.setItem(0, (j+8), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.D2[-1][(j+1)] - var.Do[1][j])))
                     var.ria.ui.tableWidget.setItem(1, (j+8), self.item)
                     """atualiza valores em Davg"""
                     var.Davg[1][j] = var.wlast*var.Davg[1][j] + var.wcurr*var.D2[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(2, (j+8), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(0, (j+8), self.item)
                     """atualiza valores em T"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.T2[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.T2[-1][(j+1)]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3, (j+8), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.T2[-1][(j+1)] - var.To[1][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4, (j+8), self.item)
                     """atualiza valores em Tavg"""
                     var.Tavg[1][j] = var.wlast*var.Tavg[1][j] + var.wcurr*var.T2[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(5, (j+8), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(1, (j+8), self.item)
@@ -416,44 +436,44 @@ class RIA(QtGui.QMainWindow):
                 """atualiza tabela na interface"""
                 for j in range(8):
                     """atualiza valores em D"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.D3[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.D3[-1][(j+1)]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0, (j+16), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.D3[-1][(j+1)] - var.Do[2][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(1, (j+16), self.item)
                     """atualiza valores em Davg"""
                     var.Davg[2][j] = var.wlast*var.Davg[2][j] + var.wcurr*var.D3[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(2, (j+16), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(0, (j+16), self.item)
                     """atualiza valores em T"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.T3[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.T3[-1][(j+1)]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3, (j+16), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.T3[-1][(j+1)] - var.To[1][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4, (j+16), self.item)
                     """atualiza valores em Tavg"""
                     var.Tavg[2][j] = var.wlast*var.Tavg[2][j] + var.wcurr*var.T3[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(5, (j+16), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(1, (j+16), self.item)
@@ -471,44 +491,44 @@ class RIA(QtGui.QMainWindow):
                 """atualiza tabela na interface"""
                 for j in range(6):
                     """atualiza valores em D"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.D4[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.D4[-1][(j+1)]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0, (j+24), self.item)
                     """atualiza valores de D-Do"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.D4[-1][(j+1)] - var.Do[3][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(1, (j+24), self.item)
                     """atualiza valores em Davg"""
                     var.Davg[3][j] = var.wlast*var.Davg[3][j] + var.wcurr*var.D4[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(2, (j+24), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(0, (j+24), self.item)
                     """atualiza valores em T"""
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.T4[-1][(j+1)]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.T4[-1][(j+1)]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(3, (j+24), self.item)
                     """atualiza valores de T-To"""
-                    self.item = QtGui.QTableWidgetItem(
+                    self.item = QtWidgets.QTableWidgetItem(
                         str('%.3f' % (var.T4[-1][(j+1)] - var.To[3][j])))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(4, (j+24), self.item)
                     """atualiza valores em Tavg"""
                     var.Tavg[3][j] = var.wlast*var.Tavg[3][j] + var.wcurr*var.T4[-1][(j+1)]
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(5, (j+24), self.item)
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_3.setItem(1, (j+24), self.item)
@@ -678,33 +698,37 @@ class RIA(QtGui.QMainWindow):
 
     """ inicializa racks """
     def init_rack(self, address):
-        for i in address:
-            if i > 0 and i < 5:
-                self.data = chr(i) + chr(0xf0)
-                self.send(self.data)
-                time.sleep(1.2)
+        try:
+            for i in address:
+                if i > 0 and i < 5:
+                    self.data = chr(i) + chr(0xf0)
+                    self.send(self.data)
+                    time.sleep(1.2)
 
-                self.data = chr(i) + chr(0xf1)
-                self.send(self.data)
-                time.sleep(0.1)
-                if self.response == "" and i == 1:
-                    var.rack_status[0] = False
-                    var.ria.ui.led1_g.hide()
-                    var.ria.ui.led1_y.show()
-                if self.response == "" and i == 2:
-                    var.rack_status[1] = False
-                    var.ria.ui.led2_g.hide()
-                    var.ria.ui.led2_y.show()
-                if self.response == "" and i == 3:
-                    var.rack_status[2] = False
-                    var.ria.ui.led3_g.hide()
-                    var.ria.ui.led3_y.show()
-                if self.response == "" and i == 4:
-                    var.rack_status[3] = False
-                    var.ria.ui.led4_g.hide()
-                    var.ria.ui.led4_y.show()
-            else:
-                print("Rack address out of range")
+                    self.data = chr(i) + chr(0xf1)
+                    self.send(self.data)
+                    time.sleep(0.1)
+                    if self.response == "" and i == 1:
+                        var.rack_status[0] = False
+                        var.ria.ui.led1_g.hide()
+                        var.ria.ui.led1_y.show()
+                    if self.response == "" and i == 2:
+                        var.rack_status[1] = False
+                        var.ria.ui.led2_g.hide()
+                        var.ria.ui.led2_y.show()
+                    if self.response == "" and i == 3:
+                        var.rack_status[2] = False
+                        var.ria.ui.led3_g.hide()
+                        var.ria.ui.led3_y.show()
+                    if self.response == "" and i == 4:
+                        var.rack_status[3] = False
+                        var.ria.ui.led4_g.hide()
+                        var.ria.ui.led4_y.show()
+                else:
+                    print("Rack address out of range")
+        except:
+            #print("Init_rack error")
+            pass
 
     """ adquire e salva dados dos sensores """
     def acquire(self, address):
@@ -788,14 +812,25 @@ class RIA(QtGui.QMainWindow):
                             var.D4 = var.D4[1:]
                             var.T4 = var.T4[1:]
                 self.refresh_table(i)
-                try:
-                    self.plot(i)
-                except ValueError:
-                    pass
-                except IndexError:
-                    pass
-                except:
-                    print('erro em plot line 1062')
+                """ chamada de ação de plot da tela 'Monitor'
+                    * a tratativa de erro está implementada dentro da função call_plot
+                      (devido a troca de contexto entre diferentes threads)"""
+                var.i = i
+                self.thread_plot.start()
+
+                # """ chamada de ação de plot da tela 'Online' """
+                if(var.plotFlag):
+                    self.thread_plot_on.start()
+                    #plot.plot_call(i)
+                # try:
+                #     if(var.plotFlag):
+                #         plot.plot_call(i)
+                # except ValueError:
+                #     pass
+                # except IndexError:
+                #     pass
+                # except:
+                #     print('erro em plot da tela Online')
             else:
                 print('Endereço %i não existe \n' % i)
 
@@ -1157,28 +1192,28 @@ class RIA(QtGui.QMainWindow):
             a = lines[7].split('\t')[:-1]
             for i in range(8):
                 var.Do[0][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[0][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0, (i), self.item)
             a = lines[8].split('\t')[:-1]
             for i in range(8):
                 var.Do[1][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[1][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[1][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0, (i+8), self.item)
             a = lines[9].split('\t')[:-1]
             for i in range(8):
                 var.Do[2][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[2][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[2][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0, (i+16), self.item)
             a = lines[10].split('\t')[:-1]
             for i in range(6):
                 var.Do[3][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[3][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[3][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(0, (i+24), self.item)
@@ -1187,28 +1222,28 @@ class RIA(QtGui.QMainWindow):
             a = lines[11].split('\t')[:-1]
             for i in range(8):
                 var.To[0][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[0][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(1, (i), self.item)
             a = lines[12].split('\t')[:-1]
             for i in range(8):
                 var.To[1][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[1][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[1][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(1, (i+8), self.item)
             a = lines[13].split('\t')[:-1]
             for i in range(8):
                 var.To[2][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[2][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[2][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(1, (i+16), self.item)
             a = lines[14].split('\t')[:-1]
             for i in range(6):
                 var.To[3][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[0][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_2.setItem(1, (i+24), self.item)
@@ -1217,28 +1252,28 @@ class RIA(QtGui.QMainWindow):
             a = lines[15].split('\t')[:-1]
             for i in range(8):
                 var.Davg[0][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[0][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(0, (i), self.item)
             a = lines[16].split('\t')[:-1]
             for i in range(8):
                 var.Davg[1][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[1][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[1][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(0, (i+8), self.item)
             a = lines[17].split('\t')[:-1]
             for i in range(8):
                 var.Davg[2][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[2][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[2][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(0, (i+16), self.item)
             a = lines[18].split('\t')[:-1]
             for i in range(6):
                 var.Davg[3][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Davg[3][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Davg[3][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(0, (i+24), self.item)
@@ -1247,28 +1282,28 @@ class RIA(QtGui.QMainWindow):
             a = lines[19].split('\t')[:-1]
             for i in range(8):
                 var.Tavg[0][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[0][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[0][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(1, (i), self.item)
             a = lines[20].split('\t')[:-1]
             for i in range(8):
                 var.Tavg[1][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[1][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[1][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(1, (i+8), self.item)
             a = lines[21].split('\t')[:-1]
             for i in range(8):
                 var.Tavg[2][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[2][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[2][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(1, (i+16), self.item)
             a = lines[22].split('\t')[:-1]
             for i in range(8):
                 var.Tavg[3][i] = a[i]
-                self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Tavg[3][i]))
+                self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Tavg[3][i]))
                 self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                    QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 var.ria.ui.tableWidget_3.setItem(1, (i+24), self.item)
@@ -1324,22 +1359,22 @@ class RIA(QtGui.QMainWindow):
 
             # NOVO{
             """Carrega estado dos plots da aba 'Online'"""
-            var.ria.ui.checkPlot1_on.setChecked(0)
-            var.ria.ui.checkPlot2_on.setChecked(0)
-            var.ria.ui.checkPlot3_on.setChecked(0)
-            var.ria.ui.checkPlot4_on.setChecked(0)
-            var.ria.ui.checkPlot5_on.setChecked(0)
-            var.ria.ui.checkPlot6_on.setChecked(0)
-            var.ria.ui.checkPlot7_on.setChecked(0)
-            var.ria.ui.checkPlot8_on.setChecked(0)
-            var.ria.ui.checkPlot9_on.setChecked(0)
-            var.ria.ui.checkPlot10_on.setChecked(0)
-            var.ria.ui.checkPlot11_on.setChecked(0)
-            var.ria.ui.checkPlot12_on.setChecked(0)
-            var.ria.ui.checkPlot13_on.setChecked(0)
-            var.ria.ui.checkPlot14_on.setChecked(0)
-            var.ria.ui.checkPlot15_on.setChecked(0)
-            var.ria.ui.checkPlot16_on.setChecked(0)
+            # var.ria.ui.checkPlot1_on.setChecked(0)
+            # var.ria.ui.checkPlot2_on.setChecked(0)
+            # var.ria.ui.checkPlot3_on.setChecked(0)
+            # var.ria.ui.checkPlot4_on.setChecked(0)
+            # var.ria.ui.checkPlot5_on.setChecked(0)
+            # var.ria.ui.checkPlot6_on.setChecked(0)
+            # var.ria.ui.checkPlot7_on.setChecked(0)
+            # var.ria.ui.checkPlot8_on.setChecked(0)
+            # var.ria.ui.checkPlot9_on.setChecked(0)
+            # var.ria.ui.checkPlot10_on.setChecked(0)
+            # var.ria.ui.checkPlot11_on.setChecked(0)
+            # var.ria.ui.checkPlot12_on.setChecked(0)
+            # var.ria.ui.checkPlot13_on.setChecked(0)
+            # var.ria.ui.checkPlot14_on.setChecked(0)
+            # var.ria.ui.checkPlot15_on.setChecked(0)
+            # var.ria.ui.checkPlot16_on.setChecked(0)
             # }
         print("Parâmetros carregados")
 
@@ -1350,7 +1385,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.Do[0] = var.D1[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[0][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(0, (j), self.item)
@@ -1361,7 +1396,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.Do[1] = var.D2[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(0, (j+8), self.item)
@@ -1372,7 +1407,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.Do[2] = var.D3[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(0, (j+16), self.item)
@@ -1383,7 +1418,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.Do[3] = var.D4[-1][1:]
                 for j in range(6):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget.setItem(0, (j+24), self.item)
@@ -1396,7 +1431,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.To[0] = var.T1[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[0][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[0][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(1, (j), self.item)
@@ -1407,7 +1442,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.To[1] = var.T2[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[1][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[1][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(1, (j+8), self.item)
@@ -1418,7 +1453,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.To[2] = var.T3[-1][1:]
                 for j in range(8):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.To[2][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.To[2][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(1, (j+16), self.item)
@@ -1429,7 +1464,7 @@ class RIA(QtGui.QMainWindow):
             try:
                 var.Do[3] = var.T4[-1][1:]
                 for j in range(6):
-                    self.item = QtGui.QTableWidgetItem(str('%.3f' % var.Do[3][j]))
+                    self.item = QtWidgets.QTableWidgetItem(str('%.3f' % var.Do[3][j]))
                     self.item.setFlags(QtCore.Qt.ItemIsDragEnabled |
                                        QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                     var.ria.ui.tableWidget_2.setItem(1, (j+24), self.item)
@@ -1464,12 +1499,27 @@ class RIA(QtGui.QMainWindow):
         self.rack_init(self.rack_address)
         print("Racks reiniciados")
 
+    def call_plot (self):
+        if (var.i <= 4 and var.i >= 1):
+            try:
+                self.plot()
+            except ValueError:
+                pass
+            except IndexError:
+                pass
+            except:
+                print('erro1 em plot da tela Monitor')
+                pass
+        else:
+            print("erro2 em plot da tela Monitor")
+
     # Plota gráficos
-    def plot(self, i):
+    def plot(self):
         # Plots 0 e 1
         self.index = divmod(var.ria.ui.PlotBox1.currentIndex(), 8)
-        if var.ria.ui.checkPlot1.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot1.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
+
             var.ria.ui.widget.Data[0].x = np.append(
                 var.ria.ui.widget.Data[0].x,
                 var.ria.D[0])
@@ -1499,7 +1549,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 2 e 3
         self.index = divmod(var.ria.ui.PlotBox2.currentIndex(), 8)
-        if var.ria.ui.checkPlot2.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot2.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[2].x = np.append(
                 var.ria.ui.widget.Data[2].x,
@@ -1530,7 +1580,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 4 e 5
         self.index = divmod(var.ria.ui.PlotBox3.currentIndex(), 8)
-        if var.ria.ui.checkPlot3.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot3.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[4].x = np.append(
                 var.ria.ui.widget.Data[4].x,
@@ -1561,7 +1611,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 6 e 7
         self.index = divmod(var.ria.ui.PlotBox4.currentIndex(), 8)
-        if var.ria.ui.checkPlot4.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot4.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[6].x = np.append(
                 var.ria.ui.widget.Data[6].x,
@@ -1592,7 +1642,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 8 e 9
         self.index = divmod(var.ria.ui.PlotBox5.currentIndex(), 8)
-        if var.ria.ui.checkPlot5.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot5.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[8].x = np.append(
                 var.ria.ui.widget.Data[8].x,
@@ -1623,7 +1673,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 10 e 11
         self.index = divmod(var.ria.ui.PlotBox6.currentIndex(), 8)
-        if var.ria.ui.checkPlot6.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot6.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[10].x = np.append(
                 var.ria.ui.widget.Data[10].x,
@@ -1654,7 +1704,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 12 e 13
         self.index = divmod(var.ria.ui.PlotBox7.currentIndex(), 8)
-        if var.ria.ui.checkPlot7.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot7.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[12].x = np.append(
                 var.ria.ui.widget.Data[12].x,
@@ -1685,7 +1735,7 @@ class RIA(QtGui.QMainWindow):
                 pass
         # Plots 14 e 15
         self.index = divmod(var.ria.ui.PlotBox8.currentIndex(), 8)
-        if var.ria.ui.checkPlot8.isChecked() and i == (self.index[0]+1):
+        if var.ria.ui.checkPlot8.isChecked() and var.i == (self.index[0]+1):
             """Plota nivel"""
             var.ria.ui.widget.Data[14].x = np.append(
                 var.ria.ui.widget.Data[14].x,
@@ -1728,7 +1778,7 @@ class Screen(threading.Thread):
     def run(self):
         var.lock.acquire()
         var.lock.release()
-        app = QtGui.QApplication(sys.argv)
+        app = QtWidgets.QApplication(sys.argv)
         var.ria = RIA()
         var.ria.ui_init()
         var.ria.show()
@@ -1754,18 +1804,27 @@ class Communication(threading.Thread):
                 raise
 
 
-class Plot(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.start()
+class PlotThread(QtCore.QThread):
+    signal = pyqtSignal()
+    def __init__(self, parent):
+        QtCore.QObject.__init__(self)
+        QtCore.QThread.__init__(self, parent)
+
+        #self.signal.connect(var.ria.call_plot)
 
     def callback(self):
         self._stop()
 
     def run(self):
-        while var.graphFlag:
-            pass
+        self.signal.emit()
 
 
 if __name__ == "__main__":
-    telas = Screen()
+    # telas = Screen()
+    var.lock.acquire()
+    var.lock.release()
+    app = QtWidgets.QApplication(sys.argv)
+    var.ria = RIA()
+    var.ria.ui_init()
+    var.ria.show()
+    sys.exit(app.exec_())

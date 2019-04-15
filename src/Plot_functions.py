@@ -3,12 +3,12 @@
 #
 import datetime, time, sys, threading
 import numpy as np
-from PyQt4.QtGui import *
 import matplotlib.pyplot as plt
-import PyQt4.Qwt5 as Qwt
+from qwt import QwtPlot as Qwt
 from os import listdir
 from Variables import var
 from Plot_definitions import dataclass
+from PyQt5 import QtGui, QtWidgets
 
 class PlotOnOff:
     def __init__(self):
@@ -16,6 +16,7 @@ class PlotOnOff:
         self.data_fim = ""
         self.data = ""
         self.flagPlot_off = False
+        self.plotSet = "nivel"
         #self.plotBox_act()
 
     """ Define between level and temperature variable to be plotted """
@@ -48,6 +49,7 @@ class PlotOnOff:
     def setRef_on(self):
         if(var.rack1 == 1):
             var.refD1 = var.D1[-1][1:]
+            var.refSet = True
             # teste de nova referencia, em relação ao shift inicial no plot de refSensor ##
             try:
                 self.shiftSensD1 = var.refD1 - self.val_ref_D
@@ -58,16 +60,19 @@ class PlotOnOff:
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack2 == 1):
             var.refD2 = var.D2[-1][1:]
+            var.refSet = True
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
                                                     str(var.refD2)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack3 == 1):
             var.refD3 = var.D3[-1][1:]
+            var.refSet = True
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
                                                     str(var.refD3)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
         if(var.rack4 == 1):
             var.refD4 = var.D4[-1][1:]
+            var.refSet = True
             var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
                                                     str(var.refD4)+', time: ' +
                                                     time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
@@ -86,132 +91,103 @@ class PlotOnOff:
             var.ria.ui.widget_on.Plots[j].setTitle(var.disp_sensores[int(j/8)][j%8])
             var.ria.ui.widget_on.Data[j] = dataclass()
 
-    def startPlot_absBoxes(self):
-        var.plotFlag = True
-        self.plotType_on = "absBoxes"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: ABSOLUTA\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
+    # def startPlot_absBoxes(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "absBoxes"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Raw Value\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
+    #
+    # def startPlot_abs(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "abs"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Raw Value\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
+    #
+    # def startPlot_refSensor(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "refSensor"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Specific Sensor\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
+    #
+    # def startPlot_refMediaG(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "refMediaG"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Overall Mean\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
+    #
+    # def startPlot_refMediaI(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "refMediaI"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Local Mean\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
+    #
+    # def startPlot_refFixa(self):
+    #     var.plotFlag = True
+    #     self.plotType_on = "refFixa"
+    #     var.ria.ui.logOutput_on.insertPlainText("Selected reference: Time Fixed Data\n")
+    #     var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
 
-    def startPlot_abs(self):
+    def startPlot_on (self):
+        if(var.ria.ui.refBox_on.currentIndex() == 0):
+            var.ria.ui.logOutput_on.insertPlainText("Selected reference: Raw Value\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+        elif(var.ria.ui.refBox_on.currentIndex() == 2):
+            var.ria.ui.logOutput_on.insertPlainText("Selected reference: Specific Sensor\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+        elif(var.ria.ui.refBox_on.currentIndex() == 3):
+            var.ria.ui.logOutput_on.insertPlainText("Selected reference: Overall Mean\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+        elif(var.ria.ui.refBox_on.currentIndex() == 4):
+            var.ria.ui.logOutput_on.insertPlainText("Selected reference: Local Mean\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+        elif(var.ria.ui.refBox_on.currentIndex() == 1 and var.refSet):
+            var.ria.ui.logOutput_on.insertPlainText("Selected reference: Time Fixed Data\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+        else:
+            QtWidgets.QMessageBox.information(var.ria, "Plot error","Error in plot. Please, push the Set time ref. button before start plot in this mode.")
+            return
         var.plotFlag = True
-        self.plotType_on = "abs"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: ABSOLUTA\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
 
-    def startPlot_refSensor(self):
-        var.plotFlag = True
-        self.plotType_on = "refSensor"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: SENSOR\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
-
-    def startPlot_refMediaG(self):
-        var.plotFlag = True
-        self.plotType_on = "refMediaG"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: MÉDIA GERAL\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
-
-    def startPlot_refMediaI(self):
-        var.plotFlag = True
-        self.plotType_on = "refMediaI"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: MÉDIA LOCAL\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
-
-    def startPlot_refFixa(self):
-        var.plotFlag = True
-        self.plotType_on = "refFixa"
-        var.ria.ui.logOutput_on.insertPlainText("Referência selecionada: VALOR FIXO\n")
-        var.ria.ui.logOutput_on.moveCursor(QTextCursor.End)
-        Plot_thread = Plot()
-
-    def stopPlot(self):
+    def stopPlot_on(self):
         var.plotFlag = False
 
     def plot_call(self):
-        # checking for updated data by inspecting the size of the tupple
-        global tam_D1
-        global tam_D2
-        global tam_D3
-        global tam_D4
-        if(len(var.D1) != 0):
-            if(len(var.D1) != tam_D1):
-                var.rack1 = 1
-                tam_D1 = len(var.D1)
-            else:
-                var.rack1 = 0
-        if(len(var.D2) != 0):
-            if((len(var.D2) != tam_D2)):
-                var.rack2 = 1
-                tam_D2 = len(var.D2)
-            else:
-                var.rack2 = 0
-        if(len(var.D3) != 0):
-            if((len(var.D3) != tam_D3)):
-                var.rack3 = 1
-                tam_D3 = len(var.D3)
-            else:
-                var.rack3 = 0
-        if(len(var.D4) != 0):
-            if((len(var.D4) != tam_D4)):
-                var.rack4 = 1
-                tam_D4 = len(var.D4)
-            else:
-                var.rack4 = 0
-
-        # call a function to plot data not referenced (absolut values)
-        if(self.plotType_on == "abs"):
-            if(var.rack1 == 1):
-                self.plot_abs(1)
-            if(var.rack2 == 1):
-                self.plot_abs(2)
-            if(var.rack3 == 1):
-                self.plot_abs(3)
-            if(var.rack4 == 1):
-                self.plot_abs(4)
+        self.str_hora = time.mktime(time.localtime())
+        # call function to plot raw data
+        if(var.ria.ui.refBox_on.currentIndex() == 0):
+            self.plot_abs(var.i)
         # call a function to plot data referenced by a specific sensor
-        if(self.plotType_on == "refSensor"):
-            if(var.rack1 == 1):
-                self.plot_refSensor(1)
-            if(var.rack2 == 1):
-                self.plot_refSensor(2)
-            if(var.rack3 == 1):
-                self.plot_refSensor(3)
-            if(var.rack4 == 1):
-                self.plot_refSensor(4)
+        elif(var.ria.ui.refBox_on.currentIndex() == 1):
+            self.plot_refFixa(var.i)
         # call a function to plot data referenced by the average of all sensors data
-        if(self.plotType_on == "refMediaG"):
-            if(var.rack1 == 1):
-                self.plot_refMediaG(1)
-            if(var.rack2 == 1):
-                self.plot_refMediaG(2)
-            if(var.rack3 == 1):
-                self.plot_refMediaG(3)
-            if(var.rack4 == 1):
-                self.plot_refMediaG(4)
+        elif(var.ria.ui.refBox_on.currentIndex() == 2):
+            self.plot_refSensor(var.i)
         # call a function to plot data referenced by sensor's own data average
-        if(self.plotType_on == "refMediaI"):
-            if(var.rack1 == 1):
-                self.plot_refMediaI(1)
-            if(var.rack2 == 1):
-                self.plot_refMediaI(2)
-            if(var.rack3 == 1):
-                self.plot_refMediaI(3)
-            if(var.rack4 == 1):
-                self.plot_refMediaI(4)
+        elif(var.ria.ui.refBox_on.currentIndex() == 3):
+            self.plot_refMediaG(var.i)
         # call a function to plot data referenced by a specific value
-        if(self.plotType_on == "refFixa"):
-            if(var.rack1 == 1):
-                self.plot_refFixa(1)
-            if(var.rack2 == 1):
-                self.plot_refFixa(2)
-            if(var.rack3 == 1):
-                self.plot_refFixa(3)
-            if(var.rack4 == 1):
-                self.plot_refFixa(4)
+        elif(var.ria.ui.refBox_on.currentIndex() == 4):
+            self.plot_refMediaI(var.i)
+        else:
+            print("erro em plotType_on")
+        # else:
+        # self.str_hora = time.mktime(time.localtime())
+        # if(self.plotType_on == "abs"):
+        #     self.plot_abs(i)
+        # # call a function to plot data referenced by a specific sensor
+        # elif(self.plotType_on == "refSensor"):
+        #     self.plot_refSensor(i)
+        # # call a function to plot data referenced by the average of all sensors data
+        # elif(self.plotType_on == "refMediaG"):
+        #     self.plot_refMediaG(i)
+        # # call a function to plot data referenced by sensor's own data average
+        # elif(self.plotType_on == "refMediaI"):
+        #     self.plot_refMediaI(i)
+        # # call a function to plot data referenced by a specific value
+        # elif(self.plotType_on == "refFixa"):
+        #     self.plot_refFixa(i)
+        # else:
+        #     print("erro em plotType_on")
 
     def plotData(self, i, D, T):
         """lista criada para checar os checkPlots"""
@@ -237,7 +213,7 @@ class PlotOnOff:
                     # Time scale - x axis
                     var.ria.ui.widget_on.Data[(i*8)+j].x = np.append(
                                     var.ria.ui.widget_on.Data[(i*8)+j].x,
-                                    self.D[0]) # self.str_hora () ; self.str_hora = time.mktime(time.localtime())
+                                    self.str_hora) # self.D[0]
                     # correcting x range
                     self.menor = var.ria.ui.widget_on.Data[(i*8)+j].x[0]
                     for k in range(var.ria.ui.widget_on.nplots): #nplots = 16
@@ -251,7 +227,6 @@ class PlotOnOff:
                                                           self.menor, var.ria.ui.widget_on.Data[(i*8)+j].x[-1])
                     except TypeError:
                             print('erro3\n')
-
                     """se o comprimento do vetor de dados for maior que limite, retira o valor mais antigo"""
                     if(var.ria.ui.checkCmp_on.isChecked()):
                         try:
@@ -275,7 +250,6 @@ class PlotOnOff:
         elif(i == 4):
             self.D = var.D4[-1]
             self.T = var.T4[-1]
-
         self.plotData(i, self.D, self.T)
 
     def plot_refSensor(self, i):
@@ -407,7 +381,7 @@ class PlotOnOff:
 
         self.plotData(i, self.D, self.T)
 
-    def plot_refMediaInd(self, i):
+    def plot_refMediaI(self, i):
         self.date = time.strftime("%Y_%m_%d", time.localtime())
         if(var.rack1 == 1):
             p = open('../data/rack1_'+str(self.date)+'.dat', 'r')
@@ -572,12 +546,12 @@ class PlotOnOff:
 
         var.ria.ui.widget_on.setAxisScale(0, float(var.scaleMinY), float(var.scaleMaxY))
         var.ria.ui.widget_on.setAxisScale(2, self.flt_horaMin, self.flt_horaMax)
-        var.ria.ui.widget_on.zoomer.setZoomBase()
+        #var.ria.ui.widget_on.zoomer.setZoomBase()
 
     def setAutoScalePlot(self):
         var.ria.ui.widget_on.setAxisAutoScale(0)
         var.ria.ui.widget_on.setAxisAutoScale(2)
-        var.ria.ui.widget_on.zoomer.setZoomBase()
+        #var.ria.ui.widget_on.zoomer.setZoomBase()
 
     # converte mes no formato de 3 caracteres para numero
     def ReturnMonth(self, string):
@@ -609,35 +583,35 @@ class PlotOnOff:
     def startPlot_abs_off(self):
         self.plotType_off = "abs"
         var.ria.ui.logOutput_off.insertPlainText("Referência selecionada: ABSOLUTA\n")
-        var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+        var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
 
     def startPlot_refSensor_off(self):
         self.plotType_off = "refSens"
         var.ria.ui.logOutput_off.insertPlainText("Referência selecionada: SENSOR\n")
-        var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+        var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
 
     def startPlot_refMediaG_off(self):
         self.plotType_off = "refMediaG"
         var.ria.ui.logOutput_off.insertPlainText("Referência selecionada: MÉDIA\n")
-        var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+        var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
 
     def startPlot_refFixa_off(self):
         self.plotType_off = "refFixa"
         var.ria.ui.logOutput_off.insertPlainText("Referência selecionada: VALOR FIXO\n")
-        var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+        var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
 
     def startPlot_off(self):
         if(self.data_ini > self.data_fim and self.data_fim != ""):
             var.ria.ui.logOutput_off.insertPlainText("Erro: período inválido\n")
-            var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+            var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
             return
         elif (self.data_ini == ""):
             var.ria.ui.logOutput_off.insertPlainText("Erro: data inicial não selecionada\n")
-            var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+            var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
             return
         elif (self.data_fim == ""):
             var.ria.ui.logOutput_off.insertPlainText("Erro: data final não selecionada\n")
-            var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+            var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
             return
         else:
             onlyfiles = listdir('../data/')
@@ -765,7 +739,7 @@ class PlotOnOff:
             else:  # nao achou arquivos
                 var.ria.ui.logOutput.insertPlainText("Erro: arquivo de dados não encontrado" + '\n')
                 return
-            var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+            var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
 
     def onpick(self,event):
         # on the pick event, find the orig line corresponding to the
@@ -855,7 +829,7 @@ class PlotOnOff:
                 achou_sensor = True
         if(not achou_sensor):
             var.ria.ui.logOutput_off.insertPlainText("Erro: sensor de referência não encontrado" + '\n')
-            var.ria.ui.logOutput_off.moveCursor(QTextCursor.End)
+            var.ria.ui.logOutput_off.moveCursor(QtGui.QTextCursor.End)
             return
 
         val = []
@@ -983,35 +957,6 @@ class PlotOnOff:
         aux = date.toString()
         print ("\ndata:", aux)
         self.data = aux
-
-
-class Plot(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.start()
-
-    def callback(self):
-        self._stop()
-
-    def run(self):
-        global tam_D1
-        global tam_D2
-        global tam_D3
-        global tam_D4
-        tam_D1 = 0
-        tam_D2 = 0
-        tam_D3 = 0
-        tam_D4 = 0
-        param = open('../parameters.dat', 'r')
-        self.lines = param.readlines()
-        self.date = time.strftime("%Y_%m_%d", time.localtime())
-        try:
-            while var.plotFlag:
-                plot.plot_call()
-                time.sleep(var.t_aq)
-        except:
-            print("Erro 22")
-            raise
 
 
 plot = PlotOnOff()
