@@ -4,7 +4,7 @@
 import datetime, time, sys, threading
 import numpy as np
 import matplotlib.pyplot as plt
-from qwt import QwtPlot as Qwt
+from qwt import QwtPlot
 from os import listdir
 from Variables import var
 from Plot_definitions import dataclass
@@ -19,16 +19,16 @@ class PlotOnOff:
         self.plotSet = "nivel"
         #self.plotBox_act()
 
-    """ Define between level and temperature variable to be plotted """
-    def plotBox_act(self):
-        # plot level
-        if var.ria.ui.plotBox_on.currentIndex() == 0:
-            self.plotSet = "nivel"
-            var.ria.ui.widget_on.setAxisTitle(Qwt.QwtPlot.yLeft, 'Height [mm]')
-        else:
-            # plot temperature
-            self.plotSet = "temp"
-            var.ria.ui.widget_on.setAxisTitle(Qwt.QwtPlot.yLeft, 'Temperature [ºC]')
+    #    """ Define between level and temperature variable to be plotted """
+    #    def plotBox_act(self):
+    #        # plot level
+    #        if var.ria.ui.plotBox_on.currentIndex() == 0:
+    #            self.plotSet = "nivel"
+    #            var.ria.ui.widget_on.setAxisTitle(QwtPlot.yLeft, 'Height [mm]')
+    #        else:
+    #            # plot temperature
+    #            self.plotSet = "temp"
+    #            var.ria.ui.widget_on.setAxisTitle(QwtPlot.yLeft, 'Temperature [ºC]')
 
     def plotBox_dataAct(self):
         self.currentDate = var.ria.ui.plotBox_data.currentText()
@@ -49,47 +49,63 @@ class PlotOnOff:
     def setRef_on(self):
         if(var.rack1 == 1):
             var.refD1 = var.D1[-1][1:]
+            var.refT1 = var.T1[-1][1:]
             var.refSet = True
             # teste de nova referencia, em relação ao shift inicial no plot de refSensor ##
             try:
                 self.shiftSensD1 = var.refD1 - self.val_ref_D
             except:
                 pass
-            var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(var.refD1)+', time: ' +
-                                                    time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
+            var.ria.ui.logOutput_on.insertPlainText("Referency values:\n " +
+                                                    '\t Time: ' + time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n'+
+                                                    '\t Level: ' + str(var.refD1)+'\n'+
+                                                    '\t Temp.: ' + str(var.refT1)+'\n')
         if(var.rack2 == 1):
             var.refD2 = var.D2[-1][1:]
+            var.refT2 = var.T2[-1][1:]
             var.refSet = True
-            var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(var.refD2)+', time: ' +
-                                                    time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
+            var.ria.ui.logOutput_on.insertPlainText("Referency values:\n " +
+                                                    '\t Time: ' + time.strftime("%H:%M:%S", time.localtime(var.D2[-1][0]))+'\n'+
+                                                    '\t Level: ' + str(var.refD2)+'\n'+
+                                                    '\t Temp.: ' + str(var.refT2)+'\n')
         if(var.rack3 == 1):
             var.refD3 = var.D3[-1][1:]
+            var.refT3 = var.T3[-1][1:]
             var.refSet = True
-            var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(var.refD3)+', time: ' +
-                                                    time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
+            var.ria.ui.logOutput_on.insertPlainText("Referency values:\n " +
+                                                    '\t Time: ' + time.strftime("%H:%M:%S", time.localtime(var.D3[-1][0]))+'\n'+
+                                                    '\t Level: ' + str(var.refD3)+'\n'+
+                                                    '\t Temp.: ' + str(var.refT3)+'\n')
         if(var.rack4 == 1):
             var.refD4 = var.D4[-1][1:]
+            var.refT4 = var.T4[-1][1:]
             var.refSet = True
-            var.ria.ui.logOutput_on.insertPlainText("Referency values: " +
-                                                    str(var.refD4)+', time: ' +
-                                                    time.strftime("%H:%M:%S", time.localtime(var.D1[-1][0]))+'\n')
+            var.ria.ui.logOutput_on.insertPlainText("Referency values:\n " +
+                                                    '\t Time: ' + time.strftime("%H:%M:%S", time.localtime(var.D4[-1][0]))+'\n'+
+                                                    '\t Level: ' + str(var.refD4)+'\n'+
+                                                    '\t Temp.: ' + str(var.refT4)+'\n')
 
     def set_plot_on(self, j):
         self.checkPlot_list = [var.ria.ui.checkPlot1_on, var.ria.ui.checkPlot2_on, var.ria.ui.checkPlot3_on, var.ria.ui.checkPlot4_on,
                                 var.ria.ui.checkPlot5_on, var.ria.ui.checkPlot6_on, var.ria.ui.checkPlot7_on, var.ria.ui.checkPlot8_on,
                                 var.ria.ui.checkPlot9_on, var.ria.ui.checkPlot10_on, var.ria.ui.checkPlot11_on, var.ria.ui.checkPlot12_on,
-                                var.ria.ui.checkPlot13_on, var.ria.ui.checkPlot14_on, var.ria.ui.checkPlot15_on, var.ria.ui.checkPlot16_on]
+                                var.ria.ui.checkPlot13_on, var.ria.ui.checkPlot14_on, var.ria.ui.checkPlot15_on, var.ria.ui.checkPlot16_on,
+                                var.ria.ui.checkPlot17_on, var.ria.ui.checkPlot18_on, var.ria.ui.checkPlot19_on, var.ria.ui.checkPlot20_on]
         if(not self.checkPlot_list[j].isChecked()):
             """apaga plot e nome caso esteja desabilitado"""
-            var.ria.ui.widget_on.Plots[j].setTitle("")
-            var.ria.ui.widget_on.Data[j] = dataclass()
-        else:
-            """muda nome do plot e zera valores"""
-            var.ria.ui.widget_on.Plots[j].setTitle(var.disp_sensores[int(j/8)][j%8])
-            var.ria.ui.widget_on.Data[j] = dataclass()
+            var.ria.ui.widget_on.Plots[2*j].setTitle("")
+            var.ria.ui.widget_on.Data[2*j] = dataclass()
+            var.ria.ui.widget_on.Plots[2*j+1].setTitle("")
+            var.ria.ui.widget_on.Data[2*j+1] = dataclass()
+        elif (self.checkPlot_list[j].isChecked()):
+            if(var.ria.ui.checkPlot_level_on.isChecked()):
+                """muda nome do plot e zera valores"""
+                var.ria.ui.widget_on.Plots[2*j].setTitle(var.disp_sensores[int(j/5)][j%5]+'-L')
+                var.ria.ui.widget_on.Data[2*j] = dataclass()
+            if(var.ria.ui.checkPlot_temp_on.isChecked()):
+                """muda nome do plot e zera valores"""
+                var.ria.ui.widget_on.Plots[2*j+1].setTitle(var.disp_sensores[int(j/5)][j%5]+'-T')
+                var.ria.ui.widget_on.Data[2*j+1] = dataclass()
 
     # def startPlot_absBoxes(self):
     #     var.plotFlag = True
@@ -164,10 +180,15 @@ class PlotOnOff:
             self.plot_refSensor(var.i)
         # call a function to plot data referenced by sensor's own data average
         elif(var.ria.ui.refBox_on.currentIndex() == 3):
-            self.plot_refMediaG(var.i)
+            plotStatus = self.plot_refMediaG(var.i)
+            if (plotStatus == "not ok"):
+                var.plotFlag = False
         # call a function to plot data referenced by a specific value
         elif(var.ria.ui.refBox_on.currentIndex() == 4):
-            self.plot_refMediaI(var.i)
+            plotStatus = self.plot_refMediaI(var.i)
+            if (plotStatus == "not ok"):
+                var.plotFlag = False
+                
         else:
             print("erro em plotType_on")
         # else:
@@ -194,48 +215,54 @@ class PlotOnOff:
         self.list_check = [var.ria.ui.checkPlot1_on, var.ria.ui.checkPlot2_on, var.ria.ui.checkPlot3_on, var.ria.ui.checkPlot4_on,
                            var.ria.ui.checkPlot5_on, var.ria.ui.checkPlot6_on, var.ria.ui.checkPlot7_on, var.ria.ui.checkPlot8_on,
                            var.ria.ui.checkPlot9_on, var.ria.ui.checkPlot10_on, var.ria.ui.checkPlot11_on, var.ria.ui.checkPlot12_on,
-                           var.ria.ui.checkPlot13_on, var.ria.ui.checkPlot14_on, var.ria.ui.checkPlot15_on, var.ria.ui.checkPlot16_on]
+                           var.ria.ui.checkPlot13_on, var.ria.ui.checkPlot14_on, var.ria.ui.checkPlot15_on, var.ria.ui.checkPlot16_on,
+                           var.ria.ui.checkPlot17_on, var.ria.ui.checkPlot18_on, var.ria.ui.checkPlot19_on, var.ria.ui.checkPlot20_on]
         # correcting rack number to be used properly as index above
         i = i - 1
-        if(i <= 1):  # TEMPORARIO (checkPLots ainda vão só até 16)
-            for j in range(8):
-                if(self.list_check[(i*8)+j].isChecked()):
-                    # Level plot - y axis
-                    if(self.plotSet == "nivel"):
-                        var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
-                                    var.ria.ui.widget_on.Data[(i*8)+j].y,
-                                    self.D[j+1])
-                    else:
-                        # Temperature plot - y axis
-                        var.ria.ui.widget_on.Data[(i*8)+j].y = np.append(
-                                    var.ria.ui.widget_on.Data[(i*8)+j].y,
-                                    self.T[j+1])
+        #if(i <= 1):  # TEMPORARIO (checkPLots ainda vão só até 16)
+        for j in range(5):
+            if(self.list_check[(i*5)+j].isChecked() and self.list_check[(i*5)+j].text != "N/C"):
+                # Level plot - y axis
+                if(var.ria.ui.checkPlot_level_on.isChecked()): # CheckBox for plotting Level Data
+                    var.ria.ui.widget_on.Data[(i*10)+(2*j)].y = np.append(
+                                var.ria.ui.widget_on.Data[(i*10)+(2*j)].y,
+                                self.D[j+1])
                     # Time scale - x axis
-                    var.ria.ui.widget_on.Data[(i*8)+j].x = np.append(
-                                    var.ria.ui.widget_on.Data[(i*8)+j].x,
+                    var.ria.ui.widget_on.Data[(i*10)+(2*j)].x = np.append(
+                                    var.ria.ui.widget_on.Data[(i*10)+(2*j)].x,
                                     self.str_hora) # self.D[0]
-                    # correcting x range
-                    self.menor = var.ria.ui.widget_on.Data[(i*8)+j].x[0]
-                    for k in range(var.ria.ui.widget_on.nplots): #nplots = 16
-                        try:
-                            if(var.ria.ui.widget_on.Data[k].x[0] < self.menor):
-                                self.menor = var.ria.ui.widget_on.Data[k].x[0]
-                        except:
-                            pass
+                if(var.ria.ui.checkPlot_temp_on.isChecked()): # CheckBox for plotting Temp Data
+                    # Temperature plot - y axis
+                    var.ria.ui.widget_on.Data[(i*10)+(2*j+1)].y = np.append(
+                                var.ria.ui.widget_on.Data[(i*10)+(2*j+1)].y, #VERIFICAR INDEXAÇÃO
+                                self.T[j+1])
+                    # Time scale - x axis
+                    var.ria.ui.widget_on.Data[(i*10)+(2*j+1)].x = np.append(
+                                    var.ria.ui.widget_on.Data[(i*10)+(2*j+1)].x,
+                                    self.str_hora) # self.D[0]
+                
+                # correcting x range
+                self.menor = var.ria.ui.widget_on.Data[(i*10)+j].x[0]
+                for k in range(var.ria.ui.widget_on.nplots): #nplots = 16
                     try:
-                        var.ria.ui.widget_on.setAxisScale(var.ria.ui.widget_on.xBottom,
-                                                          self.menor, var.ria.ui.widget_on.Data[(i*8)+j].x[-1])
+                        if(var.ria.ui.widget_on.Data[k].x[0] < self.menor):
+                            self.menor = var.ria.ui.widget_on.Data[k].x[0]
+                    except:
+                        pass
+                try:
+                    var.ria.ui.widget_on.setAxisScale(var.ria.ui.widget_on.xBottom,
+                                                      self.menor, var.ria.ui.widget_on.Data[(i*5)+j].x[-1])
+                except TypeError:
+                        print('erro3\n')
+                """se o comprimento do vetor de dados for maior que limite, retira o valor mais antigo"""
+                if(var.ria.ui.checkCmp_on.isChecked()):
+                    try:
+                        if len(var.ria.ui.widget_on.Data[(i*10)+j].x) > var.cmp_on:
+                            self.dif = len(var.ria.ui.widget_on.Data[(i*5)+j].x) - var.cmp_on
+                            var.ria.ui.widget_on.Data[(i*10)+j].x = var.ria.ui.widget_on.Data[(i*10)+j].x[self.dif:]
+                            var.ria.ui.widget_on.Data[(i*10)+j].y = var.ria.ui.widget_on.Data[(i*10)+j].y[self.dif:]
                     except TypeError:
-                            print('erro3\n')
-                    """se o comprimento do vetor de dados for maior que limite, retira o valor mais antigo"""
-                    if(var.ria.ui.checkCmp_on.isChecked()):
-                        try:
-                            if len(var.ria.ui.widget_on.Data[(i*8)+j].x) > var.cmp_on:
-                                self.dif = len(var.ria.ui.widget_on.Data[(i*8)+j].x) - var.cmp_on
-                                var.ria.ui.widget_on.Data[(i*8)+j].x = var.ria.ui.widget_on.Data[(i*8)+j].x[self.dif:]
-                                var.ria.ui.widget_on.Data[(i*8)+j].y = var.ria.ui.widget_on.Data[(i*8)+j].y[self.dif:]
-                        except TypeError:
-                            print('erro4\n')
+                        print('erro4\n')
 
     def plot_abs(self, i):
         if(i == 1):
@@ -308,26 +335,27 @@ class PlotOnOff:
 
     def plot_refMediaG(self, i):
         ## getting the general data average ##
+        self.dir = '../Data/'
         self.date = time.strftime("%Y_%m_%d", time.localtime())
         self.sumD = 0
         self.sumT = 0
         self.total = 0
         active_racks = [var.rack1, var.rack2, var.rack3, var.rack4]
         for k in range (4):
-            if (active_racks[k] == True and k == 1):
-                arq = '../data/rack1_'+str(self.date)+'.dat'
+            if (active_racks[k] == True and k == 0):
+                arq = self.dir+'rack1_'+str(self.date)+'.dat'
+            elif (active_racks[k] == True and k == 1):
+                arq = self.dir+'rack2_'+str(self.date)+'.dat'
             elif (active_racks[k] == True and k == 2):
-                arq = '../data/rack2_'+str(self.date)+'.dat'
+                arq = self.dir+'rack3_'+str(self.date)+'.dat'
             elif (active_racks[k] == True and k == 3):
-                arq = '../data/rack3_'+str(self.date)+'.dat'
-            elif (active_racks[k] == True and k == 4):
-                arq = '../data/rack4_'+str(self.date)+'.dat'
+                arq = self.dir+'rack4_'+str(self.date)+'.dat'
             try:
                 p = open(arq, 'r')
                 self.lines = p.readlines()
                 self.values = self.lines[-1].split()
                 p.close()
-
+    
                 for j in range(8):
                     if(float(self.values[2+j]) > 5 and float(self.values[2+j]) < 10):
                         self.sumD = self.sumD + float(self.values[2+j])
@@ -335,10 +363,14 @@ class PlotOnOff:
                         self.total += 1
             except:
                 pass
-
-        self.meanD = self.sumD/self.tam
-        self.meanT = self.sumT/self.tam
-
+        try:
+            self.meanD = self.sumD/self.total
+            self.meanT = self.sumT/self.total
+        except ZeroDivisionError:
+            var.ria.ui.logOutput_on.insertPlainText("Error on the Overall mean plot. Stopping plot...\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+            return "not ok"
+        
         if(i == 1):
             self.D = var.D1[-1]
             self.T = var.T1[-1]
@@ -356,6 +388,7 @@ class PlotOnOff:
         self.T[1:] = np.subtract(self.T[1:], self.meanT)
 
         self.plotData(i, self.D, self.T)
+        return 'ok'
 
     def plot_refDeltaCG(self, i):
         if(i == 1):
@@ -382,9 +415,10 @@ class PlotOnOff:
         self.plotData(i, self.D, self.T)
 
     def plot_refMediaI(self, i):
+        self.dir = '../Data/'
         self.date = time.strftime("%Y_%m_%d", time.localtime())
         if(var.rack1 == 1):
-            p = open('../data/rack1_'+str(self.date)+'.dat', 'r')
+            p = open(self.dir+'rack1_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
@@ -394,7 +428,7 @@ class PlotOnOff:
             var.sumD1[8] += 1  # total number of items to get the average
             var.sumT1[8] += 1
         if(var.rack2 == 1):
-            p = open('../data/rack2_'+str(self.date)+'.dat', 'r')
+            p = open(self.dir+'rack2_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
@@ -404,7 +438,7 @@ class PlotOnOff:
             var.sumD2[8] += 1
             var.sumT2[8] += 1
         if(var.rack3 == 1):
-            p = open('../data/rack3_'+str(self.date)+'.dat', 'r')
+            p = open(self.dir+'rack3_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
@@ -414,7 +448,7 @@ class PlotOnOff:
             var.sumD3[8] += 1
             var.sumT3[8] += 1
         if(var.rack4 == 1):
-            p = open('../data/rack4_'+str(self.date)+'.dat', 'r')
+            p = open(self.dir+'rack4_'+str(self.date)+'.dat', 'r')
             self.lines = p.readlines()
             self.values = self.lines[-1].split()
             p.close()
@@ -439,29 +473,34 @@ class PlotOnOff:
 
         self.D = np.array([])
         self.T = np.array([])
-        for k in range(8):
-            if(i == 0):
-                self.D = var.D1[-1]
-                self.T = var.T1[-1]
-                self.D[1:] = np.subtract(self.D[1:], self.meanD1)
-                self.T[1:] = np.subtract(self.T[1:], self.meanT1)
-            if(i == 1):
-                self.D = var.D2[-1]
-                self.T = var.T2[-1]
-                self.D[1:] = np.subtract(self.D[1:], self.meanD2)
-                self.T[1:] = np.subtract(self.T[1:], self.meanT2)
-            if(i == 2):
-                self.D = var.D3[-1]
-                self.T = var.T3[-1]
-                self.D[1:] = np.subtract(self.D[1:], self.meanD3)
-                self.T[1:] = np.subtract(self.T[1:], self.meanT3)
-            if(i == 3):
-                self.D = var.D4[-1]
-                self.T = var.T4[-1]
-                self.D[1:] = np.subtract(self.D[1:], self.meanD4)
-                self.T[1:] = np.subtract(self.T[1:], self.meanT4)
-
+        try:
+            for k in range(8):
+                if(i == 1):
+                    self.D = var.D1[-1]
+                    self.T = var.T1[-1]
+                    self.D[1:] = np.subtract(self.D[1:], self.meanD1)
+                    self.T[1:] = np.subtract(self.T[1:], self.meanT1)
+                if(i == 2):
+                    self.D = var.D2[-1]
+                    self.T = var.T2[-1]
+                    self.D[1:] = np.subtract(self.D[1:], self.meanD2)
+                    self.T[1:] = np.subtract(self.T[1:], self.meanT2)
+                if(i == 3):
+                    self.D = var.D3[-1]
+                    self.T = var.T3[-1]
+                    self.D[1:] = np.subtract(self.D[1:], self.meanD3)
+                    self.T[1:] = np.subtract(self.T[1:], self.meanT3)
+                if(i == 4):
+                    self.D = var.D4[-1]
+                    self.T = var.T4[-1]
+                    self.D[1:] = np.subtract(self.D[1:], self.meanD4)
+                    self.T[1:] = np.subtract(self.T[1:], self.meanT4)
+        except ValueError:
+            var.ria.ui.logOutput_on.insertPlainText("Error on the local mean plot. Stopping plot...\n")
+            var.ria.ui.logOutput_on.moveCursor(QtGui.QTextCursor.End)
+            return "not ok"
         self.plotData(i, self.D, self.T)
+        return "ok"
 
     def plot_refMMQ(self, i):
         if(i == 1):

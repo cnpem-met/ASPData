@@ -1,24 +1,24 @@
-HLS_sensor1 - Nivel: 7.6048 mm
-HLS_sensor1 - Temp: 25.3676 C
+HLS_sensor2 - Nivel: 10.057 mm
+HLS_sensor2 - Temp: 25.1125 C
 
-HLS_sensor2 - Nivel: 8.2699 mm
-HLS_sensor2 - Temp: 25.7601 C
+HLS_sensor3 - Nivel: 5.1981 mm
+HLS_sensor3 - Temp: 2.6246 C
 
-HLS_sensor3 - Nivel: 7.9578 mm
-HLS_sensor3 - Temp: 25.4316 C
+HLS_sensor4 - Nivel: 5.1974 mm
+HLS_sensor4 - Temp: 2.6295 C
 
-HLS_sensor4 - Nivel: 7.6079 mm
-HLS_sensor4 - Temp: 25.6735C
+HLS_sensor5 - Nivel: 5.1987 mm
+HLS_sensor5 - Temp: 2.6261 C
 
-HLS_sensor5 - Nivel: 8.6902 mm
-HLS_sensor5 - Temp: 25.8154 C
+HLS_sensor6 - Nivel: 5.1986 mm
+HLS_sensor6 - Temp: 2.6248 C
 
-HLS_sensor6 - Nivel: 8.9339 mm
-HLS_sensor6 - Temp: 25.5978 C
+HLS_sensor7 - Nivel: 5.1978 mm
+HLS_sensor7 - Temp: 2.6275 C
 
-HLS_sensor7 - Nivel: 8.8959 mm
-HLS_sensor7 - Temp: 25.7361 C
+HLS_sensor8 - Nivel: 5.1975 mm
+HLS_sensor8 - Temp: 2.603 C
 
-HLS_sensor8 - Nivel: 8.0361 mm
-HLS_sensor8 - Temp: 25.9681 C
+HLS_sensor9 - Nivel: 5.1969 mm
+HLS_sensor9 - Temp: 2.6297 C
 

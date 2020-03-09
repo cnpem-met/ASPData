@@ -15,7 +15,7 @@ class Var(object):
         self.lock = threading.RLock()
 
         """lista de sensores que é mostrada no 'plot options'"""
-        self.sensor_list = ["H7DC_32", "H7DC_33", "H7DC_34", "H7DC_35", "H7DC_36",
+        self.sensor_list = ["H7DC_35", "H7DC_33", "H7DC_34", "H7DC_32", "H7DC_36",
                        "H7DC_37", "H7DC_38", "H7DC_39", "H7DC_40", "H7DC_41",
                        "H7DC_42", "H7DC_43", "H7DC_44", "H7DC_45", "H7DC_46",
                        "H7DC_47", "H7DC_48", "H7DC_49", "H7DC_50", "H7DC_51",

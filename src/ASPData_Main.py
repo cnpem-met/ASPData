@@ -5,6 +5,7 @@ import sys, os
 import threading
 import serial
 import numpy as np
+import logging
 from Variables import var
 from UI_definitions import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -14,14 +15,16 @@ from functools import partial
 from Plot_definitions import dataclass
 from Plot_functions import plot
 
-""" setting the root directory to the scripts folder """
-os.chdir('..\..\src')
+#""" setting the root directory to the scripts folder """
+os.chdir(os.getcwd()+'/src/')
+""" checking the existence of a log file; if not, it will create it """
+#if(not os.path.exists("../Logs/errors.log")):
+print(os.getcwd())
 
-# try:
-#     _fromUtf8 = QtCore.QString.fromUtf8
-# except AttributeError:
-#     def _fromUtf8(s):
-#         return s
+open("../Logs/errors.log", 'a').close()
+
+""" initializing the log settings """
+logging.basicConfig(filename='../Logs/errors.log',level=logging.INFO)
 
 class RIA(QtWidgets.QMainWindow):
 
@@ -173,7 +176,11 @@ class RIA(QtWidgets.QMainWindow):
         var.ria.ui.checkPlot14_on.stateChanged.connect(partial(plot.set_plot_on, j=13))
         var.ria.ui.checkPlot15_on.stateChanged.connect(partial(plot.set_plot_on, j=14))
         var.ria.ui.checkPlot16_on.stateChanged.connect(partial(plot.set_plot_on, j=15))
-        var.ria.ui.plotBox_on.currentIndexChanged.connect(plot.plotBox_act)
+        var.ria.ui.checkPlot17_on.stateChanged.connect(partial(plot.set_plot_on, j=16))
+        var.ria.ui.checkPlot18_on.stateChanged.connect(partial(plot.set_plot_on, j=17))
+        var.ria.ui.checkPlot19_on.stateChanged.connect(partial(plot.set_plot_on, j=18))
+        var.ria.ui.checkPlot20_on.stateChanged.connect(partial(plot.set_plot_on, j=19))
+        #var.ria.ui.plotBox_on.currentIndexChanged.connect(plot.plotBox_act)
         var.ria.ui.cmp_on.valueChanged.connect(plot.set_cmp_on)
         var.ria.ui.setRef_onBtn.clicked.connect(plot.setRef_on)
         var.ria.ui.plotBox_data.currentIndexChanged.connect(plot.plotBox_dataAct)
@@ -764,8 +771,10 @@ class RIA(QtWidgets.QMainWindow):
                 else:
                     try:
                         self.v_converter(self.response, i)
-                    except:
-                        print("erro em v_converter")
+                    except Exception as e:
+                        logging.exception(self.date+', '+self.time+'\n'+str(e))
+                        logging.info("-------------------------------------------")                      
+                        #print("erro em v_converter")
                         raise
                     if i == 1:
                         """atualiza D1"""
@@ -821,16 +830,7 @@ class RIA(QtWidgets.QMainWindow):
                 # """ chamada de ação de plot da tela 'Online' """
                 if(var.plotFlag):
                     self.thread_plot_on.start()
-                    #plot.plot_call(i)
-                # try:
-                #     if(var.plotFlag):
-                #         plot.plot_call(i)
-                # except ValueError:
-                #     pass
-                # except IndexError:
-                #     pass
-                # except:
-                #     print('erro em plot da tela Online')
+
             else:
                 print('Endereço %i não existe \n' % i)
 
@@ -890,7 +890,7 @@ class RIA(QtWidgets.QMainWindow):
         self.date1 = self.date.replace('_', '/')
         self.time = time.strftime("%H:%M:%S", time.localtime())  # adquire hora
 
-        self.dir = '../data/'
+        self.dir = '../Data/'
         """salva dados em arquivos nomeados por data, na forma:
         data, hora, D1, D2, D3, D4, D5, D6, D7, D8, T1, T2, T3, T4, T5, T6, T7, T8"""
         for i in address:
@@ -1357,25 +1357,6 @@ class RIA(QtWidgets.QMainWindow):
             """Carrega indice de porta de comunicação serial"""
             var.ria.ui.PortBox.setCurrentIndex(int(lines[25]))
 
-            # NOVO{
-            """Carrega estado dos plots da aba 'Online'"""
-            # var.ria.ui.checkPlot1_on.setChecked(0)
-            # var.ria.ui.checkPlot2_on.setChecked(0)
-            # var.ria.ui.checkPlot3_on.setChecked(0)
-            # var.ria.ui.checkPlot4_on.setChecked(0)
-            # var.ria.ui.checkPlot5_on.setChecked(0)
-            # var.ria.ui.checkPlot6_on.setChecked(0)
-            # var.ria.ui.checkPlot7_on.setChecked(0)
-            # var.ria.ui.checkPlot8_on.setChecked(0)
-            # var.ria.ui.checkPlot9_on.setChecked(0)
-            # var.ria.ui.checkPlot10_on.setChecked(0)
-            # var.ria.ui.checkPlot11_on.setChecked(0)
-            # var.ria.ui.checkPlot12_on.setChecked(0)
-            # var.ria.ui.checkPlot13_on.setChecked(0)
-            # var.ria.ui.checkPlot14_on.setChecked(0)
-            # var.ria.ui.checkPlot15_on.setChecked(0)
-            # var.ria.ui.checkPlot16_on.setChecked(0)
-            # }
         print("Parâmetros carregados")
 
     # define valor atual das medidas de nivel e temperatura como referência

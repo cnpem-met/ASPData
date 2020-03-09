@@ -1,7 +1,7 @@
 import time
 from qwt.qt.QtCore import Qt, QObject
-from qwt.qt.QtGui import (QPen, QFrame)
-from qwt import QwtPlot, QwtPlotCurve, QwtScaleDraw, QwtPlotGrid, QwtAbstractScaleDraw, QwtText, QwtLegend
+from qwt.qt.QtGui import (QPen, QFrame, QColor)
+from qwt import QwtPlot, QwtPlotCurve, QwtScaleDraw, QwtPlotGrid, QwtAbstractScaleDraw, QwtText, QwtLegend, QwtSymbol
 import numpy as np
 
 class SimplePlot(QwtPlot):
@@ -91,10 +91,14 @@ class SimplePlot_on(QwtPlot):
         # colors = [Qt.Qt.red, Qt.Qt.yellow, Qt.Qt.green, Qt.Qt.blue, Qt.Qt.cyan, Qt.Qt.magenta, Qt.Qt.gray, Qt.Qt.white,
         #           Qt.Qt.darkRed, Qt.Qt.darkYellow, Qt.Qt.darkGreen, Qt.Qt.darkBlue, Qt.Qt.darkCyan,
         #           Qt.Qt.darkMagenta, Qt.Qt.lightGray, Qt.Qt.darkGray]
-        colors = [Qt.red, Qt.darkRed, Qt.green, Qt.darkGreen, Qt.blue,
-                  Qt.darkBlue, Qt.cyan, Qt.darkCyan, Qt.magenta,
-                  Qt.darkMagenta, Qt.yellow, Qt.darkYellow, Qt.gray,
-                  Qt.darkGray, Qt.lightGray, Qt.black]
+        #colors = [Qt.red, Qt.darkRed, Qt.green, Qt.darkGreen, Qt.blue,
+        #          Qt.darkBlue, Qt.cyan, Qt.darkCyan, Qt.magenta,
+        #          Qt.darkMagenta, Qt.yellow, Qt.darkYellow, Qt.gray,
+        #          Qt.darkGray, Qt.lightGray, Qt.black]
+        colors = [QColor('#CC0000'), QColor('#FF3333'), QColor('#CC6600'), QColor('#FF9933'), QColor('#CCCC00'),
+                  QColor('#FFFF33'), QColor('#66CC00'), QColor('#00CCCC'), QColor('#33FFFF'), QColor('#0066CC'),
+                  QColor('#3399FF'), QColor('#3399FF'), QColor('#0000CC'), QColor('#6600CC'), QColor('#9933FF'),
+                  QColor('#CC00CC'), QColor('#FF33FF'), QColor('#CC0066'), QColor('#FF3399'), QColor('#C0C0C0')]
         QwtPlot.__init__(self, *args)
 
         self.setCanvasBackground(Qt.black)
@@ -108,20 +112,31 @@ class SimplePlot_on(QwtPlot):
         # setting axis title. The yLeft axis title can chance to 'Temperature', depending on plot preferences
         self.setAxisTitle(QwtPlot.xBottom, 'Time [hh:mm:ss]')
         self.setAxisTitle(QwtPlot.yLeft, 'Height [mm]')
+        
+        # Habilita e denomina eixo Y2
+        self.enableAxis(QwtPlot.yRight)
+        self.setAxisTitle(QwtPlot.yRight, 'Temperature[ºC]')
 
-        self.nplots = 16
+        self.nplots = 40
         self.Plots = np.array([])
         self.Data = np.array([])
 
         for i in range(self.nplots):
             self.Plots = np.append(self.Plots,QwtPlotCurve())
-            self.Plots[i].setPen(QPen(colors[i]))
+            if (i%2 == 0):
+                pen = QPen(colors[int(i/2)], 1, Qt.SolidLine)
+            else:
+                pen = QPen(colors[int(i/2)], 1, Qt.DashLine)
+            self.Plots[i].setPen(pen)
             self.Plots[i].attach(self)
             """define como valor plotado será escrito no eixo x"""
             self.setAxisScaleDraw(QwtPlot.xBottom, TimeScaleDraw())
             self.Data = np.append(self.Data,dataclass())
-            # define a tupple that will contain plot data, expressed in cartesian coordinates
-            self.Plots[i].setData(self.Data[i].x,self.Data[i].y)
+            
+            if divmod(i, 2)[1] == 1:
+                self.Plots[i].setYAxis(QwtPlot.yRight)
+             # define a tupple that will contain plot data, expressed in cartesian coordinates
+            self.Plots[i].setData(self.Data[i].x, self.Data[i].y)
 
         # legend
         # self.legend = QwtLegend()
