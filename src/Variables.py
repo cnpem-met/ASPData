@@ -231,10 +231,10 @@ class Var(object):
 
         self.plotFlag = False
 
-        self.rack1 = 0
-        self.rack2 = 0
-        self.rack3 = 0
-        self.rack4 = 0
+        #self.rack1 = 0
+        #self.rack2 = 0
+        #self.rack3 = 0
+        #self.rack4 = 0
 
         self.posSens = [-420,-80, 360, 750, 1100, 1450, 1880, 2260]
 

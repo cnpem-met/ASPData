@@ -15,12 +15,10 @@ from functools import partial
 from Plot_definitions import dataclass
 from Plot_functions import plot
 
-#""" setting the root directory to the scripts folder """
+""" setting the root directory to the scripts folder """
 os.chdir(os.getcwd()+'/src/')
-""" checking the existence of a log file; if not, it will create it """
-#if(not os.path.exists("../Logs/errors.log")):
-print(os.getcwd())
 
+""" checking the existence of a log file; if not, it will create it """
 open("../Logs/errors.log", 'a').close()
 
 """ initializing the log settings """
@@ -184,7 +182,18 @@ class RIA(QtWidgets.QMainWindow):
         var.ria.ui.cmp_on.valueChanged.connect(plot.set_cmp_on)
         var.ria.ui.setRef_onBtn.clicked.connect(plot.setRef_on)
         var.ria.ui.plotBox_data.currentIndexChanged.connect(plot.plotBox_dataAct)
-
+        
+        
+        """ try to start automatically the acquision *
+                * This functionallity was implemented in an effort to make the 
+                acquisition system robust to power crashs and so on """
+        try:
+            self.open_com("/dev/ttyUSB0", dif_port=True)
+        except Exception as e:
+            logging.exception('Could not start the automatic acquisition \n'+str(e))
+            logging.info("-------------------------------------------")                      
+            raise
+        
 
     """ muda valor de tempo de aquisição de dados """
     def set_t_aq(self):
@@ -205,10 +214,13 @@ class RIA(QtWidgets.QMainWindow):
         var.ria.ui.PortBox.addItems(self.ports_list)
 
     """ abre comunicação serial """
-    def open_com(self):
+    def open_com(self, Port, dif_port=False):
+        if (dif_port == True):
+            port = Port
+        else:
+            port = var.ria.ports_list[var.ria.ui.PortBox.currentIndex()]
         try:
-            var.ria.ser = serial.Serial(var.ria.ports_list[var.ria.ui.PortBox.currentIndex()],
-                                        115200, 8, 'N', timeout=.5)
+            var.ria.ser = serial.Serial(port, 115200, 8, 'N', timeout=.5)
             var.serialFlag = True
             self.Com = Communication()
         except:
@@ -750,18 +762,22 @@ class RIA(QtWidgets.QMainWindow):
                     if self.response == "" and i == 1:
                         var.rack_status[0] = False
                         var.ria.ui.led1_g.hide()
+                        var.ria.ui.led1_r.hide()
                         var.ria.ui.led1_y.show()
                     if self.response == "" and i == 2:
                         var.rack_status[1] = False
                         var.ria.ui.led2_g.hide()
+                        var.ria.ui.led2_r.hide()
                         var.ria.ui.led2_y.show()
                     if self.response == "" and i == 3:
                         var.rack_status[2] = False
                         var.ria.ui.led3_g.hide()
+                        var.ria.ui.led3_r.hide()
                         var.ria.ui.led3_y.show()
                     if self.response == "" and i == 4:
                         var.rack_status[3] = False
                         var.ria.ui.led4_g.hide()
+                        var.ria.ui.led4_r.hide()
                         var.ria.ui.led4_y.show()
                     print("Não foi possível estabelecer comunicação com o Rack %d" % i)
                     print("\n")
@@ -1168,23 +1184,27 @@ class RIA(QtWidgets.QMainWindow):
             """Carrega status do Rack 1"""
             if lines[3] == 'True\n':
                 var.rack1 = True
+                var.ria.ui.check1.setChecked(True)
             else:
                 var.rack1 = False
             """Carrega status do Rack 2"""
             if lines[4] == 'True\n':
                 var.rack2 = True
+                var.ria.ui.check2.setChecked(True)
             else:
                 var.rack2 = False
 
             """Carrega status do Rack 3"""
             if lines[5] == 'True\n':
                 var.rack3 = True
+                var.ria.ui.check3.setChecked(True)
             else:
                 var.rack3 = False
 
             """Carrega status do Rack 4"""
             if lines[6] == 'True\n':
                 var.rack4 = True
+                var.ria.ui.check4.setChecked(True)
             else:
                 var.rack4 = False
 
